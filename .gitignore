@@ -2,10 +2,13 @@
 node_modules/
 backend/node_modules/
 
-# Ficheiros de ambiente (com senhas)
-.env
-.env.local
-.env.production
+# Ignorar ficheiros .env em qualquer pasta
+*.env
+*.env.local
+*.env.production
+
+# Especificamente ignorar o .env da pasta backend
+backend/.env
 
 # Ficheiros do sistema
 .DS_Store
