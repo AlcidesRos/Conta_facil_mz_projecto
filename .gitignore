@@ -1,0 +1,14 @@
+# Pastas de dependências
+node_modules/
+backend/node_modules/
+
+# Ficheiros de ambiente (com senhas)
+.env
+.env.local
+.env.production
+
+# Ficheiros do sistema
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
