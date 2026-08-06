@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="pt-MZ">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>ContaFácil MZ — Gestão financeira para o seu negócio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.3/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --blue-900:#1E3A8A;
+  --blue-800:#1D4ED8;
+  --blue-700:#2563EB;
+  --blue-500:#3B82F6;
+  --blue-100:#DBEAFE;
+  --green-600:#10B981;
+  --green-500:#34D399;
+  --green-100:#D1FAE5;
+  --navy:#0B1E33;
+  --ink:#0F1B2A;
+  --slate-600:#4B5A6B;
+  --slate-400:#8598AB;
+  --bg:#F3F7FB;
+  --card:#FFFFFF;
+  --border:#E1E9F1;
+  --danger:#D64545;
+  --danger-bg:#FCEBEB;
+  --warn:#C98A1A;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --radius-sm:8px;
+  --font-display:'Manrope',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --shadow-sm:0 1px 2px rgba(11,30,51,.06);
+  --shadow-md:0 8px 24px rgba(11,30,51,.08);
+  --shadow-lg:0 20px 48px rgba(11,30,51,.14);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4,.font-display{font-family:var(--font-display);}
+.mono{font-family:var(--font-mono);}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,select{font-family:inherit;}
+ul{list-style:none;}
+img{max-width:100%;}
+::selection{background:var(--green-100);}
+
+.screen{display:none;min-height:100vh;}
+.screen.active{display:block;}
+
+/* ---------- Coin badge signature element ---------- */
+.coin{
+  width:34px;height:34px;border-radius:50%;
+  background:conic-gradient(from 220deg,var(--green-500),var(--blue-700) 60%, var(--green-500));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--font-mono);font-weight:600;font-size:11px;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.35), 0 4px 10px rgba(10,60,100,.25);
+  flex-shrink:0;
+}
+.coin.sm{width:22px;height:22px;font-size:8px;}
+.coin.lg{width:52px;height:52px;font-size:15px;}
+
+/* =================== LANDING PAGE =================== */
+#screen-landing{background:var(--navy);color:#fff;}
+.landing-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 6vw;max-width:1240px;margin:0 auto;
+}
+.landing-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:.2px;}
+.landing-nav-links{display:flex;align-items:center;gap:28px;}
+.landing-nav-links a{color:#C7D7E6;font-weight:600;font-size:14.5px;transition:color .15s;}
+.landing-nav-links a:hover{color:#fff;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border-radius:999px;font-weight:700;font-size:14.5px;
+  transition:transform .15s ease, box-shadow .15s ease, background .15s;
+}
+.btn-primary{background:linear-gradient(135deg,var(--green-500),var(--green-600));color:#fff;box-shadow:0 10px 24px rgba(18,153,90,.35);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(18,153,90,.45);}
+.btn-outline{border:1.5px solid rgba(255,255,255,.35);color:#fff;}
+.btn-outline:hover{background:rgba(255,255,255,.08);}
+.btn-ghost-blue{background:var(--blue-100);color:var(--blue-800);}
+.btn-block{width:100%;}
+
+.landing-hero{
+  max-width:1240px;margin:0 auto;padding:8vh 6vw 10vh;
+  display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(31,174,104,.15);color:#7EE6AE;border:1px solid rgba(31,174,104,.35);
+  padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700;letter-spacing:.3px;margin-bottom:22px;
+}
+.landing-hero h1{font-size:clamp(32px,4.4vw,52px);line-height:1.12;font-weight:800;letter-spacing:-.5px;}
+.landing-hero h1 .hl{color:var(--green-500);}
+.landing-hero p.lead{margin-top:20px;color:#B9CADB;font-size:17px;line-height:1.7;max-width:520px;}
+.hero-cta-row{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap;}
+.hero-note{margin-top:16px;color:#7E93A7;font-size:13px;display:flex;align-items:center;gap:8px;}
+
+.hero-visual{position:relative;}
+.hero-card{
+  background:linear-gradient(160deg,#12253C,#0D1D30);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius-lg);padding:26px;box-shadow:var(--shadow-lg);
+}
+.hero-card .hc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.hero-card .hc-label{color:#8FA3B8;font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.hero-card .hc-value{font-family:var(--font-mono);font-size:30px;font-weight:600;color:#fff;margin-top:4px;}
+.hero-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;}
+.hero-mini{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-md);padding:14px;}
+.hero-mini .m-lbl{color:#8FA3B8;font-size:11.5px;font-weight:600;}
+.hero-mini .m-val{font-family:var(--font-mono);font-size:17px;margin-top:6px;font-weight:600;}
+.up{color:#5FDB98;}
+.down{color:#F0908E;}
+
+.landing-section{max-width:1240px;margin:0 auto;padding:70px 6vw;}
+.section-head{text-align:center;max-width:640px;margin:0 auto 46px;}
+.section-head .eyebrow{display:inline-flex;}
+.section-head h2{font-size:clamp(26px,3.2vw,36px);font-weight:800;letter-spacing:-.3px;}
+.section-head p{color:#B9CADB;margin-top:12px;font-size:15.5px;}
+
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.feature-card{
+  background:#132743;border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-lg);
+  padding:26px;transition:transform .18s ease, border-color .18s;
+}
+.feature-card:hover{transform:translateY(-4px);border-color:rgba(31,174,104,.4);}
+.feature-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:16px;}
+.feature-icon.blue{background:rgba(46,134,222,.18);color:#6FB2F2;}
+.feature-icon.green{background:rgba(31,174,104,.18);color:#5FDB98;}
+.feature-card h3{font-size:16.5px;margin-bottom:8px;}
+.feature-card p{color:#9FB3C6;font-size:14px;line-height:1.6;}
+
+.stats-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  background:#0E1F35;border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-lg);
+  padding:32px 20px;margin-top:10px;
+}
+.stat-item{text-align:center;}
+.stat-item .s-num{font-family:var(--font-mono);font-size:28px;font-weight:600;color:var(--green-500);}
+.stat-item .s-lbl{color:#8FA3B8;font-size:12.5px;margin-top:6px;}
+
+.pricing-card{
+  max-width:480px;margin:0 auto;background:linear-gradient(160deg,#12253C,#0D1D30);
+  border:1px solid rgba(31,174,104,.35);border-radius:var(--radius-lg);padding:40px;text-align:center;
+  box-shadow:var(--shadow-lg);
+}
+.pricing-card .p-badge{display:inline-block;background:rgba(31,174,104,.18);color:#5FDB98;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:18px;}
+.pricing-card .p-price{font-family:var(--font-mono);font-size:44px;font-weight:600;margin:6px 0;}
+.pricing-card .p-price span{font-size:16px;color:#8FA3B8;font-family:var(--font-body);}
+.pricing-list{text-align:left;margin:26px 0;display:flex;flex-direction:column;gap:12px;}
+.pricing-list li{display:flex;gap:10px;align-items:flex-start;color:#C7D7E6;font-size:14.5px;}
+.pricing-list i{color:var(--green-500);margin-top:2px;}
+
+.landing-footer{border-top:1px solid rgba(255,255,255,.08);padding:30px 6vw;text-align:center;color:#7E93A7;font-size:13px;}
+
+/* =================== AUTH SCREENS =================== */
+.auth-wrap{
+  min-height:100vh;display:flex;
+}
+.auth-side{
+  flex:1;background:linear-gradient(160deg,var(--blue-900),var(--navy));
+  color:#fff;padding:60px;display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.auth-side::after{
+  content:"";position:absolute;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(31,174,104,.25),transparent 70%);
+  bottom:-160px;right:-160px;
+}
+.auth-side-top .landing-logo{color:#fff;margin-bottom:60px;}
+.auth-side-quote{font-family:var(--font-display);font-size:26px;line-height:1.4;font-weight:700;max-width:420px;position:relative;z-index:1;}
+.auth-side-foot{color:#8FA3B8;font-size:13px;position:relative;z-index:1;}
+.auth-form-side{
+  width:460px;max-width:100%;display:flex;align-items:center;justify-content:center;padding:40px;background:var(--card);
+}
+.auth-box{width:100%;max-width:360px;}
+.auth-box h2{font-size:25px;font-weight:800;margin-bottom:6px;}
+.auth-box .sub{color:var(--slate-600);font-size:14px;margin-bottom:30px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--slate-600);margin-bottom:6px;}
+.field .input-wrap{position:relative;}
+.field input, .field select{
+  width:100%;padding:12px 14px 12px 40px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:14.5px;background:#FBFDFF;transition:border-color .15s, box-shadow .15s;
+}
+.field input:focus, .field select:focus{outline:none;border-color:var(--blue-500);box-shadow:0 0 0 3px rgba(46,134,222,.15);background:#fff;}
+.field i.field-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--slate-400);font-size:14px;}
+.field-plain input, .field-plain select{padding-left:14px;}
+.auth-box form{margin-top:6px;}
+.auth-switch{margin-top:22px;text-align:center;font-size:14px;color:var(--slate-600);}
+.auth-switch b{color:var(--blue-700);cursor:pointer;}
+.auth-error{background:var(--danger-bg);color:var(--danger);padding:10px 14px;border-radius:var(--radius-sm);font-size:13.5px;margin-bottom:16px;display:none;}
+.back-to-landing{display:inline-flex;align-items:center;gap:6px;color:var(--slate-600);font-size:13.5px;font-weight:600;margin-bottom:26px;}
+
+/* =================== ONBOARDING =================== */
+.onboarding-wrap{max-width:820px;margin:0 auto;padding:50px 24px 80px;min-height:100vh;}
+.onboarding-head{margin-bottom:40px;}
+.onboarding-steps{display:flex;align-items:center;gap:14px;margin-top:26px;}
+.ob-step{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--slate-400);}
+.ob-step span{width:24px;height:24px;border-radius:50%;background:var(--border);color:var(--slate-600);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.ob-step.active{color:var(--ink);}
+.ob-step.active span{background:var(--green-600);color:#fff;}
+.ob-step-line{flex:0 0 40px;height:2px;background:var(--border);}
+.onboarding-panel{display:none;}
+.onboarding-panel.active{display:block;}
+.onboarding-panel h2{font-size:24px;font-weight:800;margin-bottom:8px;}
+.onboarding-panel .ob-sub{color:var(--slate-600);font-size:14.5px;margin-bottom:30px;}
+.biztype-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.biztype-card{
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-md);
+  padding:22px 14px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  transition:border-color .15s, background .15s, transform .15s;
+}
+.biztype-card i{font-size:22px;color:var(--blue-700);}
+.biztype-card span{font-size:13px;font-weight:700;color:var(--ink);text-align:center;}
+.biztype-card:hover{transform:translateY(-2px);border-color:var(--blue-500);}
+.biztype-card.selected{border-color:var(--green-600);background:var(--green-100);box-shadow:0 0 0 3px rgba(16,185,129,.15);}
+.biztype-card.selected i{color:var(--green-600);}
+.ob-actions{display:flex;justify-content:flex-end;margin-top:34px;}
+.ob-logo-row{display:flex;align-items:center;gap:18px;margin-bottom:24px;}
+.ob-logo-preview{width:64px;height:64px;border-radius:var(--radius-md);background:var(--bg);border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--slate-400);font-size:20px;overflow:hidden;flex-shrink:0;}
+.ob-logo-preview img{width:100%;height:100%;object-fit:cover;}
+@media (max-width:720px){
+  .biztype-grid{grid-template-columns:repeat(3,1fr);}
+  .onboarding-steps{font-size:12px;}
+}
+@media (max-width:480px){
+  .biztype-grid{grid-template-columns:repeat(2,1fr);}
+}
+
+/* =================== APP SHELL =================== */
+#app-shell{display:flex;min-height:100vh;}
+.sidebar{
+  width:250px;background:var(--navy);color:#fff;flex-shrink:0;
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;
+  transition:transform .25s ease;
+}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:24px 22px;font-family:var(--font-display);font-weight:800;font-size:17.5px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-nav{flex:1;padding:18px 12px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;}
+.sidebar-nav .nav-item{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);
+  color:#9FB3C6;font-size:14.5px;font-weight:600;transition:background .15s,color .15s;
+}
+.sidebar-nav .nav-item i{width:18px;text-align:center;font-size:15px;}
+.sidebar-nav .nav-item:hover{background:rgba(255,255,255,.05);color:#fff;}
+.sidebar-nav .nav-item.active{background:linear-gradient(135deg,var(--green-600),var(--green-500));color:#fff;box-shadow:0 6px 16px rgba(18,153,90,.3);}
+.sidebar-section-label{font-size:10.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#5A7089;padding:16px 14px 6px;}
+.sidebar-foot{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);}
+.sidebar-user{display:flex;align-items:center;gap:10px;}
+.sidebar-user .u-avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-700);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+.sidebar-user .u-name{font-size:13.5px;font-weight:700;}
+.sidebar-user .u-biz{font-size:11.5px;color:#8FA3B8;}
+.logout-link{margin-top:12px;display:flex;align-items:center;gap:8px;color:#F0908E;font-size:13px;font-weight:600;}
+
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(10,20,35,.5);z-index:190;}
+
+.main-area{flex:1;margin-left:250px;min-width:0;}
+.topbar{
+  position:sticky;top:0;z-index:100;background:rgba(243,247,251,.85);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 30px;border-bottom:1px solid var(--border);
+}
+.hamburger{display:none;font-size:20px;color:var(--ink);}
+.topbar-title h1{font-size:20px;font-weight:800;}
+.topbar-title .crumb{color:var(--slate-600);font-size:12.5px;font-weight:600;}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.period-filter{display:flex;background:#fff;border:1px solid var(--border);border-radius:999px;padding:4px;}
+.period-filter button{padding:7px 15px;border-radius:999px;font-size:13px;font-weight:600;color:var(--slate-600);}
+.period-filter button.active{background:var(--blue-700);color:#fff;}
+
+.view{display:none;padding:26px 30px 60px;}
+.view.active{display:block;}
+
+/* cards */
+.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:26px;}
+.stat-card{
+  background:var(--card);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow-sm);
+  border:1px solid var(--border);position:relative;overflow:hidden;
+}
+.stat-card .sc-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.sc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.sc-icon.blue{background:var(--blue-100);color:var(--blue-700);}
+.sc-icon.green{background:var(--green-100);color:var(--green-600);}
+.sc-icon.red{background:var(--danger-bg);color:var(--danger);}
+.sc-icon.navy{background:#E7ECF3;color:var(--navy);}
+.sc-trend{font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;}
+.stat-card .sc-label{color:var(--slate-600);font-size:13px;font-weight:600;margin-top:16px;}
+.stat-card .sc-value{font-family:var(--font-mono);font-size:24px;font-weight:600;margin-top:4px;}
+
+.panel{background:var(--card);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--border);}
+.panel-head h3{font-size:16px;font-weight:800;}
+.panel-body{padding:22px;}
+.charts-row{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:20px;}
+
+table.data-table{width:100%;border-collapse:collapse;}
+.data-table th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--slate-400);font-weight:700;padding:10px 14px;border-bottom:1px solid var(--border);}
+.data-table td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:14px;}
+.data-table tr:last-child td{border-bottom:none;}
+.tag{display:inline-block;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:700;}
+.tag.green{background:var(--green-100);color:var(--green-600);}
+.tag.red{background:var(--danger-bg);color:var(--danger);}
+.tag.blue{background:var(--blue-100);color:var(--blue-700);}
+.row-actions button{color:var(--slate-400);font-size:14px;padding:4px 6px;}
+.row-actions button:hover{color:var(--blue-700);}
+.amount-pos{color:var(--green-600);font-family:var(--font-mono);font-weight:600;}
+.amount-neg{color:var(--danger);font-family:var(--font-mono);font-weight:600;}
+
+.view-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.empty-state{padding:50px 20px;text-align:center;color:var(--slate-400);}
+.empty-state i{font-size:34px;margin-bottom:12px;color:var(--slate-400);}
+.stock-alert-banner{background:var(--danger-bg);border:1.5px solid #F3C6C6;border-radius:var(--radius-md);padding:16px 18px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start;}
+.stock-alert-banner i{color:var(--danger);font-size:18px;margin-top:2px;}
+.stock-alert-banner b{color:var(--danger);}
+.stock-alert-banner .sab-list{margin-top:6px;font-size:13.5px;color:#8A3030;line-height:1.6;}
+.stock-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:700;}
+.stock-badge.ok{background:var(--green-100);color:var(--green-600);}
+.stock-badge.low{background:var(--danger-bg);color:var(--danger);}
+.notif-wrap{position:relative;}
+.notif-bell{position:relative;width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--slate-600);font-size:15px;}
+.notif-bell .badge-count{position:absolute;top:-4px;right:-4px;margin:0;}
+.notif-panel{display:none;position:absolute;top:48px;right:0;width:340px;max-height:420px;overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);z-index:300;}
+.notif-panel.open{display:block;}
+.notif-panel-head{padding:14px 16px;font-weight:800;font-size:14px;border-bottom:1px solid var(--border);}
+.notif-item{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;}
+.notif-item:last-child{border-bottom:none;}
+.notif-item i{margin-top:2px;}
+.notif-item .ni-title{font-weight:700;color:var(--ink);}
+.notif-item .ni-sub{color:var(--slate-600);font-size:12px;margin-top:2px;}
+.notif-empty{padding:30px 16px;text-align:center;color:var(--slate-400);font-size:13px;}
+.pdv-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start;}
+.pdv-search{margin-bottom:14px;}
+.pdv-product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+.pdv-product-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-md);padding:14px;text-align:center;transition:border-color .15s,transform .15s;}
+.pdv-product-card:hover{border-color:var(--blue-500);transform:translateY(-2px);}
+.pdv-product-card .ppc-icon{width:44px;height:44px;border-radius:10px;background:var(--blue-100);color:var(--blue-700);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:17px;overflow:hidden;}
+.pdv-product-card .ppc-icon img{width:100%;height:100%;object-fit:cover;}
+.pdv-product-card .ppc-nome{font-weight:700;font-size:13px;margin-bottom:4px;}
+.pdv-product-card .ppc-preco{font-family:var(--font-mono);font-size:13px;color:var(--green-600);font-weight:700;}
+.pdv-product-card .ppc-stock{font-size:11px;color:var(--slate-400);margin-top:4px;}
+.pdv-cart-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);gap:8px;}
+.pdv-cart-item:last-child{border-bottom:none;}
+.pdv-qty-ctrl{display:flex;align-items:center;gap:6px;}
+.pdv-qty-ctrl button{width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--border);font-size:12px;}
+.pdv-total-row{display:flex;justify-content:space-between;padding:14px 0 4px;font-weight:800;font-size:16px;border-top:2px solid var(--border);margin-top:8px;}
+.pay-method-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.pay-method{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;font-size:12.5px;font-weight:700;cursor:pointer;}
+.pay-method.selected{border-color:var(--green-600);background:var(--green-100);color:var(--green-600);}
+.recibo-box{font-family:var(--font-mono);font-size:13px;line-height:1.7;background:#FAFCFE;border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:18px;}
+.recibo-box .r-line{display:flex;justify-content:space-between;}
+.recibo-box hr{border:none;border-top:1px dashed var(--border);margin:10px 0;}
+
+/* =================== MODO ESCURO =================== */
+body.dark-mode{ background:#0F1B2D; color:#E6EDF5; }
+body.dark-mode .card, body.dark-mode .panel, body.dark-mode .stat-card, body.dark-mode .modal-box,
+body.dark-mode .auth-form-side, body.dark-mode .notif-panel{
+  background:#16283F; border-color:#22374F; color:#E6EDF5;
+}
+body.dark-mode .topbar{ background:rgba(15,27,45,.85); border-color:#22374F; }
+body.dark-mode .field input, body.dark-mode .field select, body.dark-mode input, body.dark-mode select{
+  background:#0F1B2D; border-color:#22374F; color:#E6EDF5;
+}
+body.dark-mode .data-table th{ color:#8FA3B8; border-color:#22374F; }
+body.dark-mode .data-table td{ border-color:#22374F; }
+body.dark-mode .empty-state, body.dark-mode .sr-sub, body.dark-mode .slate-600{ color:#8FA3B8; }
+body.dark-mode .settings-row{ border-color:#22374F; }
+body.dark-mode .period-filter, body.dark-mode .notif-bell{ background:#16283F; border-color:#22374F; }
+body.dark-mode .pdv-product-card, body.dark-mode .biztype-card{ background:#16283F; border-color:#22374F; }
+.empty-state p{font-size:14px;}
+
+/* modal */
+.modal-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(10,20,35,.55);z-index:500;
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-backdrop.active{display:flex;}
+.modal-box{background:#fff;border-radius:var(--radius-lg);width:460px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border);}
+.modal-head h3{font-size:17px;font-weight:800;}
+.modal-close{font-size:18px;color:var(--slate-400);}
+.modal-body{padding:22px 24px;}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+.badge-count{background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:999px;margin-left:auto;}
+
+.profile-card{display:flex;align-items:center;gap:18px;padding:24px;}
+.profile-card .p-avatar{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--blue-700),var(--green-600));display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:800;}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);}
+.settings-row:last-child{border-bottom:none;}
+.settings-row .sr-title{font-weight:700;font-size:14.5px;}
+.settings-row .sr-sub{font-size:12.5px;color:var(--slate-600);margin-top:2px;}
+.switch{position:relative;width:44px;height:24px;background:var(--border);border-radius:999px;transition:background .2s;}
+.switch::after{content:"";position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.switch.on{background:var(--green-500);}
+.switch.on::after{left:23px;}
+
+.client-avatar{width:38px;height:38px;border-radius:50%;background:var(--blue-100);color:var(--blue-700);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;overflow:hidden;flex-shrink:0;}
+
+@media (max-width: 980px){
+  .cards-grid{grid-template-columns:repeat(2,1fr);}
+  .charts-row{grid-template-columns:1fr;}
+  .landing-hero{grid-template-columns:1fr;}
+  .features-grid{grid-template-columns:1fr 1fr;}
+  .stats-strip{grid-template-columns:1fr 1fr;}
+}
+@media (max-width: 720px){
+  .auth-side{display:none;}
+  .auth-form-side{width:100%;}
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.show{display:block;}
+  .main-area{margin-left:0;}
+  .hamburger{display:block;}
+  .cards-grid{grid-template-columns:1fr 1fr;}
+  .topbar{padding:14px 16px;}
+  .view{padding:18px 16px 60px;}
+  .landing-nav-links a:not(.btn){display:none;}
+  .features-grid{grid-template-columns:1fr;}
+  .stats-strip{grid-template-columns:1fr 1fr;}
+  .grid-2{grid-template-columns:1fr;}
+  .data-table{font-size:13px;}
+  .panel-body{overflow-x:auto;}
+}
+@media (max-width:480px){
+  .cards-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     LANDING PAGE
+========================================================= -->
+<section id="screen-landing" class="screen active">
+  <nav class="landing-nav">
+    <div class="landing-logo"><span class="coin sm">MT</span> ContaFácil MZ</div>
+    <div class="landing-nav-links">
+      <a href="#recursos">Recursos</a>
+      <a href="#planos">Planos</a>
+      <a href="javascript:void(0)" onclick="showScreen('login')">Entrar</a>
+      <a href="javascript:void(0)" class="btn btn-primary" onclick="showScreen('register')">Teste grátis 7 dias</a>
+    </div>
+  </nav>
+
+  <div class="landing-hero">
+    <div>
+      <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Feito para pequenos negócios de Moçambique</div>
+      <h1>Controle as contas do seu negócio <span class="hl">sem complicação</span></h1>
+      <p class="lead">Registe receitas e despesas, acompanhe clientes e saiba exactamente quanto o seu negócio está a ganhar — tudo em Metical (MZN), a partir do telemóvel ou computador.</p>
+      <div class="hero-cta-row">
+        <a href="javascript:void(0)" class="btn btn-primary" onclick="showScreen('register')"><i class="fa-solid fa-rocket"></i> Começar teste grátis de 7 dias</a>
+        <a href="javascript:void(0)" class="btn btn-outline" onclick="showScreen('login')"><i class="fa-solid fa-arrow-right-to-bracket"></i> Já tenho conta</a>
+      </div>
+      <div class="hero-note"><i class="fa-solid fa-circle-check" style="color:#5FDB98;"></i> Não precisa de cartão de crédito para experimentar</div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hc-row">
+          <div>
+            <div class="hc-label">Saldo actual</div>
+            <div class="hc-value">42.850,00 MT</div>
+          </div>
+          <span class="coin lg">MT</span>
+        </div>
+        <div class="hero-mini-grid">
+          <div class="hero-mini"><div class="m-lbl">Receitas do mês</div><div class="m-val up">+38.200 MT</div></div>
+          <div class="hero-mini"><div class="m-lbl">Despesas do mês</div><div class="m-val down">-19.640 MT</div></div>
+          <div class="hero-mini"><div class="m-lbl">Lucro do mês</div><div class="m-val up">+18.560 MT</div></div>
+          <div class="hero-mini"><div class="m-lbl">Clientes activos</div><div class="m-val" style="color:#fff;">12</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-section" id="recursos">
+    <div class="section-head">
+      <div class="eyebrow"><i class="fa-solid fa-layer-group"></i> Tudo o que precisa</div>
+      <h2>Um sistema simples para o seu dia-a-dia</h2>
+      <p>Sem jargão contabilístico. Só o essencial para tomar boas decisões no seu negócio.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon green"><i class="fa-solid fa-coins"></i></div><h3>Receitas e despesas em MZN</h3><p>Registe cada venda e gasto em segundos, com categoria, descrição e data — tudo em Metical.</p></div>
+      <div class="feature-card"><div class="feature-icon blue"><i class="fa-solid fa-chart-line"></i></div><h3>Dashboard actualizado na hora</h3><p>Saldo, receitas, despesas e lucro do mês actualizam-se automaticamente a cada registo.</p></div>
+      <div class="feature-card"><div class="feature-icon green"><i class="fa-solid fa-users"></i></div><h3>Gestão de clientes e dívidas</h3><p>Guarde nome, telefone e saldo devedor de cada cliente, com histórico completo de pagamentos.</p></div>
+      <div class="feature-card"><div class="feature-icon blue"><i class="fa-solid fa-filter"></i></div><h3>Filtros por período</h3><p>Veja o desempenho do seu negócio hoje, esta semana, este mês ou este ano.</p></div>
+      <div class="feature-card"><div class="feature-icon green"><i class="fa-solid fa-file-lines"></i></div><h3>Relatórios claros</h3><p>Gráficos de receitas e despesas por categoria para perceber onde o dinheiro entra e sai.</p></div>
+      <div class="feature-card"><div class="feature-icon blue"><i class="fa-solid fa-mobile-screen-button"></i></div><h3>Feito para o telemóvel</h3><p>Interface leve e rápida, pensada para quem gere o negócio a partir do smartphone.</p></div>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-item"><div class="s-num">7 dias</div><div class="s-lbl">De teste grátis</div></div>
+      <div class="stat-item"><div class="s-num">100%</div><div class="s-lbl">Em Metical (MZN)</div></div>
+      <div class="stat-item"><div class="s-num">0</div><div class="s-lbl">Conhecimento contabilístico necessário</div></div>
+      <div class="stat-item"><div class="s-num">24/7</div><div class="s-lbl">Acesso ao seu negócio</div></div>
+    </div>
+  </div>
+
+  <div class="landing-section" id="planos">
+    <div class="section-head">
+      <div class="eyebrow"><i class="fa-solid fa-gift"></i> Comece hoje</div>
+      <h2>Experimente sem compromisso</h2>
+      <p>Explore todas as funcionalidades do ContaFácil MZ durante 7 dias, de graça.</p>
+    </div>
+    <div class="pricing-card">
+      <span class="p-badge">TESTE GRÁTIS</span>
+      <div class="p-price">7 <span>dias grátis</span></div>
+      <ul class="pricing-list">
+        <li><i class="fa-solid fa-circle-check"></i> Registo ilimitado de receitas e despesas</li>
+        <li><i class="fa-solid fa-circle-check"></i> Dashboard com gráficos mensais</li>
+        <li><i class="fa-solid fa-circle-check"></i> Módulo completo de clientes e dívidas</li>
+        <li><i class="fa-solid fa-circle-check"></i> Relatórios por período e categoria</li>
+        <li><i class="fa-solid fa-circle-check"></i> Suporte em português</li>
+      </ul>
+      <a href="javascript:void(0)" class="btn btn-primary btn-block" onclick="showScreen('register')"><i class="fa-solid fa-rocket"></i> Criar a minha conta grátis</a>
+    </div>
+  </div>
+
+  <div class="landing-footer">© 2026 ContaFácil MZ — Gestão financeira simples para pequenos empreendedores moçambicanos.</div>
+</section>
+
+<!-- =========================================================
+     LOGIN
+========================================================= -->
+<section id="screen-login" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-side">
+      <div class="auth-side-top">
+        <div class="landing-logo"><span class="coin sm">MT</span> ContaFácil MZ</div>
+        <div class="auth-side-quote">"Finalmente sei, todos os dias, quanto o meu negócio está a ganhar."</div>
+      </div>
+      <div class="auth-side-foot">Usado por comerciantes e pequenos empreendedores em todo Moçambique.</div>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-box">
+        <a href="javascript:void(0)" class="back-to-landing" onclick="showScreen('landing')"><i class="fa-solid fa-arrow-left"></i> Voltar ao início</a>
+        <h2>Entrar na sua conta</h2>
+        <p class="sub">Bem-vindo de volta! Aceda ao seu painel financeiro.</p>
+        <div class="auth-error" id="login-error">E-mail ou senha inválidos.</div>
+        <form onsubmit="handleLogin(event)">
+          <div class="field">
+            <label>E-mail</label>
+            <div class="input-wrap"><i class="fa-regular fa-envelope field-icon"></i><input type="email" id="login-email" placeholder="voce@negocio.co.mz" required></div>
+          </div>
+          <div class="field">
+            <label>Senha</label>
+            <div class="input-wrap"><i class="fa-solid fa-lock field-icon"></i><input type="password" id="login-password" placeholder="••••••••" required></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar</button>
+        </form>
+        <div class="auth-switch">Ainda não tem conta? <b onclick="showScreen('register')">Criar conta grátis</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     REGISTO
+========================================================= -->
+<section id="screen-register" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-side">
+      <div class="auth-side-top">
+        <div class="landing-logo"><span class="coin sm">MT</span> ContaFácil MZ</div>
+        <div class="auth-side-quote">Comece o seu teste grátis de 7 dias e organize as contas do seu negócio hoje mesmo.</div>
+      </div>
+      <div class="auth-side-foot">Sem cartão de crédito. Cancele quando quiser.</div>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-box">
+        <a href="javascript:void(0)" class="back-to-landing" onclick="showScreen('landing')"><i class="fa-solid fa-arrow-left"></i> Voltar ao início</a>
+        <h2>Criar conta grátis</h2>
+        <p class="sub">Leva menos de 1 minuto. Comece já a organizar o seu negócio.</p>
+        <form onsubmit="handleRegister(event)">
+          <div class="field">
+            <label>Nome do negócio</label>
+            <div class="input-wrap"><i class="fa-solid fa-store field-icon"></i><input type="text" id="reg-business" placeholder="Ex: Mercearia Central" required></div>
+          </div>
+          <div class="field">
+            <label>Nome do empreendedor</label>
+            <div class="input-wrap"><i class="fa-regular fa-user field-icon"></i><input type="text" id="reg-owner" placeholder="O seu nome completo" required></div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label>Telefone</label>
+              <div class="input-wrap"><i class="fa-solid fa-phone field-icon"></i><input type="tel" id="reg-phone" placeholder="84 000 0000" required></div>
+            </div>
+            <div class="field">
+              <label>E-mail (login)</label>
+              <div class="input-wrap"><i class="fa-regular fa-envelope field-icon"></i><input type="email" id="reg-email" placeholder="voce@negocio.co.mz" required></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Senha</label>
+            <div class="input-wrap"><i class="fa-solid fa-lock field-icon"></i><input type="password" id="reg-password" placeholder="Crie uma senha" required></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;"><i class="fa-solid fa-rocket"></i> Começar teste grátis de 7 dias</button>
+        </form>
+        <div class="auth-switch">Já tem conta? <b onclick="showScreen('login')">Entrar</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     ONBOARDING (primeira configuração)
+========================================================= -->
+<section id="screen-onboarding" class="screen">
+  <div class="onboarding-wrap">
+    <div class="onboarding-head">
+      <div class="landing-logo" style="color:var(--ink);"><span class="coin sm">MT</span> ContaFácil MZ</div>
+      <div class="onboarding-steps">
+        <div class="ob-step active" id="ob-dot-1"><span>1</span> Tipo de negócio</div>
+        <div class="ob-step-line"></div>
+        <div class="ob-step" id="ob-dot-2"><span>2</span> Dados do negócio</div>
+      </div>
+    </div>
+
+    <!-- PASSO 1: tipo de negócio -->
+    <div class="onboarding-panel active" id="ob-step-1">
+      <h2>Qual tipo de negócio você possui?</h2>
+      <p class="ob-sub">Isto ajuda-nos a preparar o sistema com as categorias certas para si.</p>
+      <div class="biztype-grid" id="biztype-grid">
+        <button type="button" class="biztype-card" data-tipo="Empresa" onclick="selectBusinessType(this)"><i class="fa-solid fa-building"></i><span>Empresa</span></button>
+        <button type="button" class="biztype-card" data-tipo="Loja" onclick="selectBusinessType(this)"><i class="fa-solid fa-shop"></i><span>Loja</span></button>
+        <button type="button" class="biztype-card" data-tipo="Supermercado" onclick="selectBusinessType(this)"><i class="fa-solid fa-cart-flatbed"></i><span>Supermercado</span></button>
+        <button type="button" class="biztype-card" data-tipo="Mercearia" onclick="selectBusinessType(this)"><i class="fa-solid fa-basket-shopping"></i><span>Mercearia</span></button>
+        <button type="button" class="biztype-card" data-tipo="Barraca" onclick="selectBusinessType(this)"><i class="fa-solid fa-store"></i><span>Barraca</span></button>
+        <button type="button" class="biztype-card" data-tipo="Quiosque" onclick="selectBusinessType(this)"><i class="fa-solid fa-shop-lock"></i><span>Quiosque</span></button>
+        <button type="button" class="biztype-card" data-tipo="Banca de mercado" onclick="selectBusinessType(this)"><i class="fa-solid fa-store-alt-slash"></i><span>Banca de Mercado</span></button>
+        <button type="button" class="biztype-card" data-tipo="Boutique" onclick="selectBusinessType(this)"><i class="fa-solid fa-shirt"></i><span>Boutique</span></button>
+        <button type="button" class="biztype-card" data-tipo="Loja de roupa" onclick="selectBusinessType(this)"><i class="fa-solid fa-vest"></i><span>Loja de Roupa</span></button>
+        <button type="button" class="biztype-card" data-tipo="Ferragem" onclick="selectBusinessType(this)"><i class="fa-solid fa-toolbox"></i><span>Ferragem</span></button>
+        <button type="button" class="biztype-card" data-tipo="Loja de eletrónicos" onclick="selectBusinessType(this)"><i class="fa-solid fa-plug"></i><span>Loja de Eletrónicos</span></button>
+        <button type="button" class="biztype-card" data-tipo="Padaria" onclick="selectBusinessType(this)"><i class="fa-solid fa-bread-slice"></i><span>Padaria</span></button>
+        <button type="button" class="biztype-card" data-tipo="Talho" onclick="selectBusinessType(this)"><i class="fa-solid fa-drumstick-bite"></i><span>Talho</span></button>
+        <button type="button" class="biztype-card" data-tipo="Cafetaria" onclick="selectBusinessType(this)"><i class="fa-solid fa-mug-saucer"></i><span>Cafetaria</span></button>
+        <button type="button" class="biztype-card" data-tipo="Farmácia" onclick="selectBusinessType(this)"><i class="fa-solid fa-briefcase-medical"></i><span>Farmácia</span></button>
+        <button type="button" class="biztype-card" data-tipo="Restaurante" onclick="selectBusinessType(this)"><i class="fa-solid fa-utensils"></i><span>Restaurante</span></button>
+        <button type="button" class="biztype-card" data-tipo="Take Away" onclick="selectBusinessType(this)"><i class="fa-solid fa-bag-shopping"></i><span>Take Away</span></button>
+        <button type="button" class="biztype-card" data-tipo="Armazém" onclick="selectBusinessType(this)"><i class="fa-solid fa-warehouse"></i><span>Armazém</span></button>
+        <button type="button" class="biztype-card" data-tipo="Distribuidora" onclick="selectBusinessType(this)"><i class="fa-solid fa-truck-ramp-box"></i><span>Distribuidora</span></button>
+        <button type="button" class="biztype-card" data-tipo="Papelaria" onclick="selectBusinessType(this)"><i class="fa-solid fa-pen-ruler"></i><span>Papelaria</span></button>
+        <button type="button" class="biztype-card" data-tipo="Oficina" onclick="selectBusinessType(this)"><i class="fa-solid fa-screwdriver-wrench"></i><span>Oficina</span></button>
+        <button type="button" class="biztype-card" data-tipo="Salão de Beleza" onclick="selectBusinessType(this)"><i class="fa-solid fa-scissors"></i><span>Salão de Beleza</span></button>
+        <button type="button" class="biztype-card" data-tipo="Outro" onclick="selectBusinessType(this)"><i class="fa-solid fa-ellipsis"></i><span>Outro</span></button>
+      </div>
+      <div class="ob-actions">
+        <button class="btn btn-primary" id="ob-continue-btn" disabled onclick="goToOnboardingStep(2)">Continuar <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- PASSO 2: dados do negócio -->
+    <div class="onboarding-panel" id="ob-step-2">
+      <h2>Fale-nos sobre o seu negócio</h2>
+      <p class="ob-sub">Estes dados aparecem no seu perfil e nos recibos e relatórios.</p>
+      <form onsubmit="handleOnboardingDetails(event)">
+        <div class="ob-logo-row">
+          <div class="ob-logo-preview" id="ob-logo-preview"><i class="fa-solid fa-image"></i></div>
+          <div>
+            <label class="btn btn-outline" style="color:var(--ink);border-color:var(--border);cursor:pointer;">
+              <i class="fa-solid fa-upload"></i> Carregar logo (opcional)
+              <input type="file" accept="image/*" id="ob-logo-input" style="display:none;" onchange="handleLogoUpload(event)">
+            </label>
+          </div>
+        </div>
+        <div class="field"><label>Nome do negócio</label><div class="field-plain"><input type="text" id="ob-business-name" placeholder="Ex: Mercearia Central" required></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Cidade</label><div class="field-plain"><input type="text" id="ob-city" placeholder="Ex: Tete" required></div></div>
+          <div class="field"><label>Telefone</label><div class="field-plain"><input type="tel" id="ob-phone" placeholder="84 000 0000" required></div></div>
+        </div>
+        <div class="field"><label>Endereço</label><div class="field-plain"><input type="text" id="ob-address" placeholder="Bairro, avenida, referência..." required></div></div>
+        <div class="ob-actions" style="justify-content:space-between;">
+          <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="goToOnboardingStep(1)"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+          <button type="submit" class="btn btn-primary">Concluir e entrar <i class="fa-solid fa-check"></i></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     APP (após login)
+========================================================= -->
+<section id="screen-app" class="screen">
+  <div id="app-shell">
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo"><span class="coin sm">MT</span> ContaFácil MZ</div>
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-view="dashboard" onclick="showView('dashboard')"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a class="nav-item" data-view="produtos" onclick="showView('produtos')"><i class="fa-solid fa-box"></i> Produtos</a>
+        <a class="nav-item" data-view="estoque" onclick="showView('estoque')"><i class="fa-solid fa-warehouse"></i> Estoque <span class="badge-count" id="nav-estoque-alert" style="display:none;">!</span></a>
+        <a class="nav-item" data-view="vendas" onclick="showView('vendas')"><i class="fa-solid fa-cash-register"></i> Vendas</a>
+        <a class="nav-item" data-view="pagamentosmoveis" onclick="showView('pagamentosmoveis')"><i class="fa-solid fa-mobile-screen-button"></i> Pagamentos Móveis</a>
+        <a class="nav-item" data-view="receitas" onclick="showView('receitas')"><i class="fa-solid fa-arrow-trend-up"></i> Receitas</a>
+        <a class="nav-item" data-view="despesas" onclick="showView('despesas')"><i class="fa-solid fa-arrow-trend-down"></i> Despesas</a>
+        <a class="nav-item" data-view="bancos" onclick="showView('bancos')"><i class="fa-solid fa-building-columns"></i> Bancos</a>
+        <a class="nav-item" data-view="cartoes" onclick="showView('cartoes')"><i class="fa-solid fa-credit-card"></i> Cartões</a>
+        <a class="nav-item" data-view="categorias" onclick="showView('categorias')"><i class="fa-solid fa-tags"></i> Categorias</a>
+        <a class="nav-item" data-view="conciliacao" onclick="showView('conciliacao')"><i class="fa-solid fa-check-double"></i> Conciliação</a>
+        <a class="nav-item" data-view="clientes" onclick="showView('clientes')"><i class="fa-solid fa-users"></i> Clientes</a>
+        <a class="nav-item" data-view="fornecedores" onclick="showView('fornecedores')"><i class="fa-solid fa-truck-field"></i> Fornecedores</a>
+        <a class="nav-item" data-view="compras" onclick="showView('compras')"><i class="fa-solid fa-cart-shopping"></i> Compras</a>
+        <a class="nav-item" data-view="caixa" onclick="showView('caixa')"><i class="fa-solid fa-vault"></i> Caixa</a>
+        <a class="nav-item" data-view="relatorios" onclick="showView('relatorios')"><i class="fa-solid fa-chart-pie"></i> Relatórios</a>
+        <a class="nav-item" data-view="funcionarios" onclick="showView('funcionarios')"><i class="fa-solid fa-user-tie"></i> Funcionários</a>
+
+        <div class="sidebar-section-label">Módulo Empresarial</div>
+        <a class="nav-item" data-view="dre" onclick="showView('dre')"><i class="fa-solid fa-file-invoice-dollar"></i> DRE</a>
+        <a class="nav-item" data-view="iva" onclick="showView('iva')"><i class="fa-solid fa-percent"></i> IVA</a>
+        <a class="nav-item" data-view="contaspagar" onclick="showView('contaspagar')"><i class="fa-solid fa-money-bill-transfer"></i> Contas a Pagar</a>
+        <a class="nav-item" data-view="contasreceber" onclick="showView('contasreceber')"><i class="fa-solid fa-hand-holding-dollar"></i> Contas a Receber</a>
+        <a class="nav-item" data-view="folhasalarios" onclick="showView('folhasalarios')"><i class="fa-solid fa-money-check-dollar"></i> Folha de Salários</a>
+        <a class="nav-item" data-view="imobilizado" onclick="showView('imobilizado')"><i class="fa-solid fa-building-columns"></i> Imobilizado</a>
+        <a class="nav-item" data-view="orcamento" onclick="showView('orcamento')"><i class="fa-solid fa-scale-balanced"></i> Orçamento vs Real</a>
+        <a class="nav-item" data-view="calendariofiscal" onclick="showView('calendariofiscal')"><i class="fa-solid fa-calendar-days"></i> Calendário Fiscal</a>
+
+        <a class="nav-item" data-view="perfil" onclick="showView('perfil')"><i class="fa-regular fa-id-card"></i> Perfil</a>
+        <a class="nav-item" data-view="configuracoes" onclick="showView('configuracoes')"><i class="fa-solid fa-gear"></i> Configurações</a>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="sidebar-user">
+          <div class="u-avatar" id="sidebar-avatar">U</div>
+          <div>
+            <div class="u-name" id="sidebar-username">Utilizador</div>
+            <div class="u-biz" id="sidebar-bizname">Negócio</div>
+          </div>
+        </div>
+        <a href="javascript:void(0)" class="logout-link" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair da conta</a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <button class="hamburger" onclick="toggleSidebar(true)"><i class="fa-solid fa-bars"></i></button>
+          <div class="topbar-title">
+            <div class="crumb" id="topbar-crumb">Visão geral</div>
+            <h1 id="topbar-title">Dashboard</h1>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="period-filter" id="period-filter">
+            <button data-period="hoje" onclick="setPeriod('hoje')">Hoje</button>
+            <button data-period="semana" onclick="setPeriod('semana')">Semana</button>
+            <button data-period="mes" class="active" onclick="setPeriod('mes')">Mês</button>
+            <button data-period="ano" onclick="setPeriod('ano')">Ano</button>
+          </div>
+          <div class="notif-wrap">
+            <button class="notif-bell" onclick="toggleNotifPanel()"><i class="fa-solid fa-bell"></i><span class="badge-count" id="notif-count" style="display:none;">0</span></button>
+            <div class="notif-panel" id="notif-panel">
+              <div class="notif-panel-head">Notificações</div>
+              <div class="notif-panel-body" id="notif-panel-body"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="cards-grid">
+          <div class="stat-card">
+            <div class="sc-top"><div class="sc-icon navy"><i class="fa-solid fa-wallet"></i></div></div>
+            <div class="sc-label">Saldo actual</div>
+            <div class="sc-value mono" id="card-saldo">0,00 MT</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-top"><div class="sc-icon green"><i class="fa-solid fa-arrow-trend-up"></i></div><div class="sc-trend" style="color:var(--green-600);" id="card-receitas-count"></div></div>
+            <div class="sc-label" id="label-receitas">Receitas do mês</div>
+            <div class="sc-value mono" id="card-receitas">0,00 MT</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-top"><div class="sc-icon red"><i class="fa-solid fa-arrow-trend-down"></i></div><div class="sc-trend" style="color:var(--danger);" id="card-despesas-count"></div></div>
+            <div class="sc-label" id="label-despesas">Despesas do mês</div>
+            <div class="sc-value mono" id="card-despesas">0,00 MT</div>
+          </div>
+          <div class="stat-card">
+            <div class="sc-top"><div class="sc-icon blue"><i class="fa-solid fa-sack-dollar"></i></div></div>
+            <div class="sc-label" id="label-lucro">Lucro do mês</div>
+            <div class="sc-value mono" id="card-lucro">0,00 MT</div>
+          </div>
+        </div>
+
+        <div class="cards-grid" id="cards-grid-kpis">
+          <div class="stat-card" data-modulo="vendas">
+            <div class="sc-top"><div class="sc-icon green"><i class="fa-solid fa-cash-register"></i></div></div>
+            <div class="sc-label">Vendas de hoje</div>
+            <div class="sc-value mono" id="card-vendas-hoje">0,00 MT</div>
+            <div class="sr-sub" id="card-vendas-hoje-count" style="margin-top:4px;"></div>
+          </div>
+          <div class="stat-card" data-modulo="estoque">
+            <div class="sc-top"><div class="sc-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div></div>
+            <div class="sc-label">Produtos em falta</div>
+            <div class="sc-value mono" id="card-produtos-falta">0</div>
+            <div class="sr-sub"><a href="javascript:void(0)" onclick="showView('estoque')" style="color:var(--blue-700);font-weight:700;">Ver estoque →</a></div>
+          </div>
+          <div class="stat-card" data-modulo="financeiro">
+            <div class="sc-top"><div class="sc-icon blue"><i class="fa-solid fa-hand-holding-dollar"></i></div></div>
+            <div class="sc-label">Contas por receber</div>
+            <div class="sc-value mono" id="card-contas-receber">0,00 MT</div>
+          </div>
+          <div class="stat-card" data-modulo="financeiro">
+            <div class="sc-top"><div class="sc-icon navy"><i class="fa-solid fa-money-bill-transfer"></i></div></div>
+            <div class="sc-label">Contas por pagar</div>
+            <div class="sc-value mono" id="card-contas-pagar">0,00 MT</div>
+          </div>
+          <div class="stat-card" data-modulo="caixa">
+            <div class="sc-top"><div class="sc-icon navy"><i class="fa-solid fa-vault"></i></div></div>
+            <div class="sc-label">Estado do caixa</div>
+            <div class="sc-value" id="card-estado-caixa" style="font-size:17px;">—</div>
+          </div>
+          <div class="stat-card" data-modulo="vendas">
+            <div class="sc-top"><div class="sc-icon blue"><i class="fa-solid fa-chart-line"></i></div></div>
+            <div class="sc-label">Ticket médio (mês)</div>
+            <div class="sc-value mono" id="card-ticket-medio">0,00 MT</div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="panel">
+            <div class="panel-head"><h3>Receitas vs Despesas (últimos 6 meses)</h3></div>
+            <div class="panel-body"><canvas id="chart-monthly" height="230"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Despesas por categoria</h3></div>
+            <div class="panel-body"><canvas id="chart-cat-dashboard" height="230"></canvas></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Últimos lançamentos</h3></div>
+          <div class="panel-body" style="padding:0;">
+            <table class="data-table" id="table-recentes">
+              <thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th style="text-align:right;">Valor</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUTOS -->
+      <div class="view" id="view-produtos">
+        <div class="view-toolbar">
+          <div class="input-wrap" style="max-width:280px;flex:1;">
+            <i class="fa-solid fa-magnifying-glass field-icon"></i>
+            <input type="text" id="produtos-search" placeholder="Pesquisar produto, marca ou código..." style="width:100%;padding:11px 14px 11px 40px;border:1.5px solid var(--border);border-radius:999px;font-size:13.5px;background:#fff;" oninput="renderProdutos()">
+          </div>
+          <button class="btn btn-primary" onclick="openProdutoModal()"><i class="fa-solid fa-plus"></i> Novo Produto</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-produtos">
+              <thead><tr><th>Produto</th><th>Categoria</th><th>Marca</th><th>Código</th><th style="text-align:right;">Preço unid.</th><th style="text-align:right;">Preço caixa</th><th style="text-align:right;">Estoque</th><th>Status</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-produtos" style="display:none;"><i class="fa-solid fa-box-open"></i><p>Ainda não tem produtos registados. Clique em "Novo Produto" para começar.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTOQUE -->
+      <div class="view" id="view-estoque">
+        <div class="stock-alert-banner" id="stock-alert-banner" style="display:none;"></div>
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Controlo de entradas e saídas de estoque</h3>
+          <button class="btn btn-primary" onclick="openMovimentoModal()"><i class="fa-solid fa-right-left"></i> Registar Movimento</button>
+        </div>
+        <div class="panel" style="margin-bottom:18px;">
+          <div class="panel-head"><h3>Níveis de estoque por produto</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-estoque-niveis">
+              <thead><tr><th>Produto</th><th style="text-align:right;">Qtd/caixa</th><th style="text-align:right;">Estoque actual</th><th style="text-align:right;">Mínimo (caixas)</th><th>Situação</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Histórico de movimentações</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-estoque-historico">
+              <thead><tr><th>Data</th><th>Hora</th><th>Produto</th><th>Tipo</th><th style="text-align:right;">Quantidade</th><th>Motivo</th><th>Utilizador</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-estoque-historico" style="display:none;"><i class="fa-solid fa-clock-rotate-left"></i><p>Ainda não há movimentações de estoque registadas.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VENDAS (PDV) -->
+      <div class="view" id="view-vendas">
+        <div class="pdv-layout">
+          <div class="panel">
+            <div class="panel-head"><h3>Ponto de Venda</h3></div>
+            <div class="panel-body">
+              <div class="input-wrap pdv-search">
+                <i class="fa-solid fa-magnifying-glass field-icon"></i>
+                <input type="text" id="pdv-search" placeholder="Pesquisar produto por nome ou código..." style="width:100%;padding:11px 14px 11px 40px;border:1.5px solid var(--border);border-radius:999px;font-size:13.5px;background:#fff;" oninput="renderPdvProducts()">
+              </div>
+              <div class="pdv-product-grid" id="pdv-product-grid"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Carrinho</h3></div>
+            <div class="panel-body">
+              <div id="pdv-cart-items"><p style="color:var(--slate-400);font-size:13.5px;text-align:center;padding:20px 0;">O carrinho está vazio.</p></div>
+              <div class="pdv-total-row"><span>Total</span><span class="mono" id="pdv-total">0,00 MT</span></div>
+
+              <div class="field" style="margin-top:16px;"><label>Cliente (opcional)</label><div class="field-plain">
+                <select id="pdv-cliente"><option value="">Cliente não identificado</option></select>
+              </div></div>
+
+              <div class="field"><label>Forma de pagamento</label>
+                <div class="pay-method-grid" id="pdv-pay-grid">
+                  <div class="pay-method selected" data-metodo="Dinheiro" onclick="selectPayMethod(this)"><i class="fa-solid fa-money-bill-wave"></i><br>Dinheiro</div>
+                  <div class="pay-method" data-metodo="M-Pesa" onclick="selectPayMethod(this)"><i class="fa-solid fa-mobile-screen"></i><br>M-Pesa</div>
+                  <div class="pay-method" data-metodo="e-Mola" onclick="selectPayMethod(this)"><i class="fa-solid fa-wallet"></i><br>e-Mola</div>
+                  <div class="pay-method" data-metodo="Transferência Bancária" onclick="selectPayMethod(this)"><i class="fa-solid fa-building-columns"></i><br>Transferência</div>
+                  <div class="pay-method" data-metodo="Cartão" onclick="selectPayMethod(this)" style="grid-column:span 2;"><i class="fa-solid fa-credit-card"></i><br>Cartão</div>
+                </div>
+              </div>
+
+              <div class="field" id="pdv-mobile-phone-field" style="display:none;">
+                <label>Número de telemóvel do cliente</label>
+                <div class="field-plain"><input type="tel" id="pdv-mobile-phone" placeholder="84 000 0000 ou 258840000000"></div>
+                <div class="sr-sub" id="pdv-mobile-sim-note" style="margin-top:4px;"></div>
+              </div>
+
+              <button class="btn btn-primary btn-block" id="pdv-finalizar-btn" style="margin-top:14px;" onclick="finalizarVenda()"><i class="fa-solid fa-check"></i> Finalizar Venda</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:18px;">
+          <div class="panel-head"><h3>Últimas vendas</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-vendas">
+              <thead><tr><th>Recibo</th><th>Data</th><th>Cliente</th><th>Pagamento</th><th style="text-align:right;">Total</th><th style="text-align:right;">Lucro</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-vendas" style="display:none;"><i class="fa-solid fa-cash-register"></i><p>Ainda não registou nenhuma venda.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGAMENTOS MÓVEIS -->
+      <div class="view" id="view-pagamentosmoveis">
+        <div class="view-toolbar">
+          <div id="pagamentos-status-badges" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Histórico de pagamentos M-Pesa / e-Mola</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-pagamentos-moveis">
+              <thead><tr><th>Data</th><th>Provedor</th><th>Telefone</th><th style="text-align:right;">Valor</th><th>Referência</th><th>Estado</th><th>Modo</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-pagamentos-moveis" style="display:none;"><i class="fa-solid fa-mobile-screen-button"></i><p>Ainda não há pagamentos móveis registados. Aparecem aqui automaticamente quando vende algo em Vendas com M-Pesa ou e-Mola.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECEITAS -->
+      <div class="view" id="view-receitas">
+        <div class="view-toolbar">
+          <div class="panel" style="border:none;box-shadow:none;background:transparent;padding:0;">
+            <h3 style="font-size:15px;color:var(--slate-600);">Total no período seleccionado: <span class="mono" id="receitas-total-periodo" style="color:var(--green-600);font-weight:700;">0,00 MT</span></h3>
+          </div>
+          <button class="btn btn-primary" onclick="openReceitaModal()"><i class="fa-solid fa-plus"></i> Nova Receita</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;">
+            <table class="data-table" id="table-receitas">
+              <thead><tr><th>Data</th><th>Categoria</th><th>Descrição</th><th style="text-align:right;">Valor</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-receitas" style="display:none;"><i class="fa-solid fa-circle-plus"></i><p>Ainda não registou nenhuma receita. Clique em "Nova Receita" para começar.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESPESAS -->
+      <div class="view" id="view-despesas">
+        <div class="view-toolbar">
+          <div style="padding:0;">
+            <h3 style="font-size:15px;color:var(--slate-600);">Total no período seleccionado: <span class="mono" id="despesas-total-periodo" style="color:var(--danger);font-weight:700;">0,00 MT</span></h3>
+          </div>
+          <button class="btn btn-primary" onclick="openDespesaModal()"><i class="fa-solid fa-plus"></i> Nova Despesa</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;">
+            <table class="data-table" id="table-despesas">
+              <thead><tr><th>Data</th><th>Categoria</th><th>Descrição</th><th style="text-align:right;">Valor</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-despesas" style="display:none;"><i class="fa-solid fa-circle-plus"></i><p>Ainda não registou nenhuma despesa. Clique em "Nova Despesa" para começar.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANCOS -->
+      <div class="view" id="view-bancos">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Saldo total em contas bancárias: <span class="mono" id="bancos-saldo-total" style="color:var(--ink);font-weight:700;">0,00 MT</span></h3>
+          <button class="btn btn-primary" onclick="openBancoModal()"><i class="fa-solid fa-plus"></i> Nova Conta Bancária</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-bancos">
+              <thead><tr><th>Banco</th><th>Nº da Conta</th><th>Titular</th><th>Tipo</th><th style="text-align:right;">Saldo actual</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-bancos" style="display:none;"><i class="fa-solid fa-building-columns"></i><p>Ainda não tem contas bancárias registadas.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARTÕES -->
+      <div class="view" id="view-cartoes">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Cartões da empresa</h3>
+          <button class="btn btn-primary" onclick="openCartaoModal()"><i class="fa-solid fa-plus"></i> Novo Cartão</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-cartoes">
+              <thead><tr><th>Cartão</th><th>Banco Emissor</th><th>Tipo</th><th>Final</th><th style="text-align:right;">Limite</th><th>Conta ligada</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-cartoes" style="display:none;"><i class="fa-solid fa-credit-card"></i><p>Ainda não tem cartões registados.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATEGORIAS -->
+      <div class="view" id="view-categorias">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Categorias de Receitas e Despesas</h3>
+          <button class="btn btn-primary" onclick="openCategoriaModal()"><i class="fa-solid fa-plus"></i> Nova Categoria</button>
+        </div>
+        <div class="charts-row">
+          <div class="panel">
+            <div class="panel-head"><h3>Categorias de Receita</h3></div>
+            <div class="panel-body" style="padding:0;">
+              <table class="data-table" id="table-categorias-receita">
+                <thead><tr><th>Nome</th><th>Status</th><th></th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Categorias de Despesa</h3></div>
+            <div class="panel-body" style="padding:0;">
+              <table class="data-table" id="table-categorias-despesa">
+                <thead><tr><th>Nome</th><th>Status</th><th></th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONCILIAÇÃO -->
+      <div class="view" id="view-conciliacao">
+        <div class="view-toolbar">
+          <div class="field-plain" style="width:260px;">
+            <select id="conciliacao-conta" onchange="renderConciliacao()"><option value="">Selecione uma conta bancária...</option></select>
+          </div>
+          <h3 style="font-size:15px;color:var(--slate-600);">Por conciliar: <span class="mono" id="conciliacao-total-pendente" style="font-weight:700;">0,00 MT</span></h3>
+        </div>
+        <div class="panel" id="conciliacao-sem-conta">
+          <div class="panel-body" style="text-align:center;padding:50px 20px;color:var(--slate-400);">
+            <i class="fa-solid fa-check-double" style="font-size:34px;margin-bottom:14px;"></i>
+            <p>Escolha uma conta bancária acima para ver os lançamentos por conciliar.</p>
+          </div>
+        </div>
+        <div class="panel" id="conciliacao-com-conta" style="display:none;">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-conciliacao">
+              <thead><tr><th style="width:40px;"></th><th>Data</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th style="text-align:right;">Valor</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-conciliacao" style="display:none;"><i class="fa-solid fa-check-double"></i><p>Todos os lançamentos desta conta já estão conciliados. 🎉</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTES -->
+      <div class="view" id="view-clientes">
+        <div class="view-toolbar">
+          <div>
+            <h3 style="font-size:15px;color:var(--slate-600);">Dívida total dos clientes: <span class="mono" id="clientes-divida-total" style="color:var(--danger);font-weight:700;">0,00 MT</span></h3>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-cliente')"><i class="fa-solid fa-user-plus"></i> Novo Cliente</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;">
+            <table class="data-table" id="table-clientes">
+              <thead><tr><th>Cliente</th><th>Telefone</th><th style="text-align:right;">Saldo devedor</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-clientes" style="display:none;"><i class="fa-solid fa-user-plus"></i><p>Ainda não tem clientes registados.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORNECEDORES -->
+      <div class="view" id="view-fornecedores">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Gerir a rede de fornecedores do seu negócio</h3>
+          <button class="btn btn-primary" onclick="openFornecedorModal()"><i class="fa-solid fa-plus"></i> Novo Fornecedor</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-fornecedores">
+              <thead><tr><th>Fornecedor</th><th>Empresa</th><th>Telefone</th><th>E-mail</th><th>Cidade</th><th>Produtos fornecidos</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-fornecedores" style="display:none;"><i class="fa-solid fa-truck-field"></i><p>Ainda não tem fornecedores registados.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPRAS -->
+      <div class="view" id="view-compras">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Total gasto em compras (mês actual): <span class="mono" id="compras-total-mes" style="color:var(--danger);font-weight:700;">0,00 MT</span></h3>
+          <button class="btn btn-primary" onclick="openCompraModal()"><i class="fa-solid fa-plus"></i> Nova Compra</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-compras">
+              <thead><tr><th>Data</th><th>Fornecedor</th><th>Produto</th><th style="text-align:right;">Qtd (unid.)</th><th style="text-align:right;">Custo unit.</th><th style="text-align:right;">Total</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-compras" style="display:none;"><i class="fa-solid fa-cart-shopping"></i><p>Ainda não registou nenhuma compra.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAIXA -->
+      <div class="view" id="view-caixa">
+        <div id="caixa-fechado-state">
+          <div class="panel">
+            <div class="panel-body" style="text-align:center;padding:50px 20px;">
+              <i class="fa-solid fa-vault" style="font-size:34px;color:var(--slate-400);margin-bottom:14px;"></i>
+              <h3 style="margin-bottom:8px;">O caixa está fechado</h3>
+              <p style="color:var(--slate-600);font-size:14px;margin-bottom:20px;">Abra o caixa para começar a registar as entradas e saídas do dia.</p>
+              <button class="btn btn-primary" onclick="openModal('modal-caixa-abrir')"><i class="fa-solid fa-lock-open"></i> Abrir Caixa</button>
+            </div>
+          </div>
+        </div>
+        <div id="caixa-aberto-state" style="display:none;">
+          <div class="cards-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="stat-card"><div class="sc-top"><div class="sc-icon navy"><i class="fa-solid fa-vault"></i></div></div><div class="sc-label">Saldo inicial</div><div class="sc-value mono" id="caixa-saldo-inicial">0,00 MT</div></div>
+            <div class="stat-card"><div class="sc-top"><div class="sc-icon green"><i class="fa-solid fa-arrow-down"></i></div></div><div class="sc-label">Entradas de hoje</div><div class="sc-value mono" id="caixa-entradas">0,00 MT</div></div>
+            <div class="stat-card"><div class="sc-top"><div class="sc-icon red"><i class="fa-solid fa-arrow-up"></i></div></div><div class="sc-label">Saídas de hoje</div><div class="sc-value mono" id="caixa-saidas">0,00 MT</div></div>
+          </div>
+          <div class="cards-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="stat-card"><div class="sc-top"><div class="sc-icon red"><i class="fa-solid fa-arrow-right-from-bracket"></i></div></div><div class="sc-label">Sangrias</div><div class="sc-value mono" id="caixa-sangrias">0,00 MT</div></div>
+            <div class="stat-card"><div class="sc-top"><div class="sc-icon green"><i class="fa-solid fa-arrow-right-to-bracket"></i></div></div><div class="sc-label">Reforços</div><div class="sc-value mono" id="caixa-reforcos">0,00 MT</div></div>
+            <div class="stat-card"><div class="sc-top"><div class="sc-icon blue"><i class="fa-solid fa-calculator"></i></div></div><div class="sc-label">Saldo esperado</div><div class="sc-value mono" id="caixa-saldo-esperado">0,00 MT</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Caixa aberto desde <span id="caixa-aberto-desde"></span></h3>
+              <div style="display:flex;gap:10px;">
+                <button class="btn btn-outline" style="color:var(--danger);border-color:var(--danger);" onclick="abrirModalMovimentoCaixa('sangria')"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sangria</button>
+                <button class="btn btn-outline" style="color:var(--green-600);border-color:var(--green-600);" onclick="abrirModalMovimentoCaixa('reforco')"><i class="fa-solid fa-arrow-right-to-bracket"></i> Reforço</button>
+                <button class="btn btn-primary" onclick="openFecharCaixaModal()"><i class="fa-solid fa-lock"></i> Fechar Caixa</button>
+              </div>
+            </div>
+            <div class="panel-body" style="padding:0;overflow-x:auto;">
+              <table class="data-table" id="table-caixa-movimentos">
+                <thead><tr><th>Hora</th><th>Tipo</th><th>Descrição</th><th style="text-align:right;">Valor</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:18px;">
+          <div class="panel-head"><h3>Histórico de fecho de caixa</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-caixa-historico">
+              <thead><tr><th>Data</th><th style="text-align:right;">Saldo inicial</th><th style="text-align:right;">Entradas</th><th style="text-align:right;">Saídas</th><th style="text-align:right;">Sangrias</th><th style="text-align:right;">Reforços</th><th style="text-align:right;">Saldo final</th><th style="text-align:right;">Diferença</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-caixa-historico" style="display:none;"><i class="fa-solid fa-clock-rotate-left"></i><p>Ainda não há fechos de caixa registados.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RELATORIOS -->
+      <div class="view" id="view-relatorios">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Relatório do período seleccionado</h3>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="exportarRelatorioExcel()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
+            <button class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="exportarRelatorioPDF()"><i class="fa-solid fa-file-pdf"></i> Exportar PDF</button>
+          </div>
+        </div>
+        <div class="charts-row">
+          <div class="panel">
+            <div class="panel-head"><h3>Receitas por categoria</h3></div>
+            <div class="panel-body"><canvas id="chart-receitas-cat" height="230"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Despesas por categoria</h3></div>
+            <div class="panel-body"><canvas id="chart-despesas-cat" height="230"></canvas></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Resumo do período seleccionado</h3></div>
+          <div class="panel-body" style="padding:0;">
+            <table class="data-table" id="table-resumo">
+              <thead><tr><th>Categoria</th><th>Tipo</th><th style="text-align:right;">Total</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- FUNCIONARIOS -->
+      <div class="view" id="view-funcionarios">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Total em salários (mensal): <span class="mono" id="funcionarios-total-salarios" style="color:var(--ink);font-weight:700;">0,00 MT</span></h3>
+          <button class="btn btn-primary" onclick="openFuncionarioModal()"><i class="fa-solid fa-user-plus"></i> Novo Funcionário</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-funcionarios">
+              <thead><tr><th>Funcionário</th><th>Cargo</th><th>Telefone</th><th style="text-align:right;">Salário</th><th>Status</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-funcionarios" style="display:none;"><i class="fa-solid fa-user-tie"></i><p>Ainda não tem funcionários registados.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DRE -->
+      <div class="view" id="view-dre">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Demonstração de Resultados — Ano <input type="number" id="dre-ano" value="" style="width:80px;border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;font-weight:700;" onchange="renderDRE()"></h3>
+        </div>
+        <div class="cards-grid">
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon green"><i class="fa-solid fa-arrow-trend-up"></i></div></div><div class="sc-label">Total Proveitos</div><div class="sc-value mono" id="dre-total-proveitos">0,00 MT</div></div>
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon red"><i class="fa-solid fa-arrow-trend-down"></i></div></div><div class="sc-label">Total Custos</div><div class="sc-value mono" id="dre-total-custos">0,00 MT</div></div>
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon blue"><i class="fa-solid fa-scale-balanced"></i></div></div><div class="sc-label">Resultado Líquido</div><div class="sc-value mono" id="dre-resultado-liquido">0,00 MT</div></div>
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon navy"><i class="fa-solid fa-landmark"></i></div></div><div class="sc-label">IRPC estimado</div><div class="sc-value mono" id="dre-irpc-estimado">0,00 MT</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Demonstração de Resultados mensal (MT)</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-dre" style="min-width:1100px;">
+              <thead><tr><th>Rubrica</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th><th>Out</th><th>Nov</th><th>Dez</th><th style="text-align:right;">Total</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--slate-400);margin-top:10px;">Os valores desta DRE são calculados automaticamente a partir dos lançamentos em Receitas e Despesas, agrupados por categoria.</p>
+      </div>
+
+      <!-- IVA -->
+      <div class="view" id="view-iva">
+        <div class="view-toolbar">
+          <div class="period-filter" id="iva-period-filter">
+            <button data-period="mes" class="active" onclick="setIvaPeriod('mes')">Mês</button>
+            <button data-period="ano" onclick="setIvaPeriod('ano')">Ano</button>
+          </div>
+          <button class="btn btn-primary" onclick="openIvaModal()"><i class="fa-solid fa-plus"></i> Novo Lançamento de IVA</button>
+        </div>
+        <div class="cards-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon green"><i class="fa-solid fa-arrow-trend-up"></i></div></div><div class="sc-label">IVA Liquidado (Vendas)</div><div class="sc-value mono" id="iva-liquidado">0,00 MT</div></div>
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon blue"><i class="fa-solid fa-arrow-trend-down"></i></div></div><div class="sc-label">IVA Dedutível (Compras)</div><div class="sc-value mono" id="iva-dedutivel">0,00 MT</div></div>
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon navy"><i class="fa-solid fa-scale-balanced"></i></div></div><div class="sc-label">IVA a Pagar / Recuperar</div><div class="sc-value mono" id="iva-saldo">0,00 MT</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Livro de registo de IVA</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-iva">
+              <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th style="text-align:right;">Base Tributável</th><th style="text-align:right;">Taxa</th><th style="text-align:right;">IVA</th><th>Nº Fatura</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-iva" style="display:none;"><i class="fa-solid fa-percent"></i><p>Ainda não há lançamentos de IVA neste período.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTAS A PAGAR -->
+      <div class="view" id="view-contaspagar">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Total por pagar: <span class="mono" id="contaspagar-total" style="color:var(--danger);font-weight:700;">0,00 MT</span></h3>
+          <button class="btn btn-primary" onclick="openContaPagarModal()"><i class="fa-solid fa-plus"></i> Nova Conta a Pagar</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-contaspagar">
+              <thead><tr><th>Fornecedor</th><th>Descrição</th><th style="text-align:right;">Valor</th><th>Emissão</th><th>Vencimento</th><th>Estado</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-contaspagar" style="display:none;"><i class="fa-solid fa-money-bill-transfer"></i><p>Ainda não tem contas a pagar registadas.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTAS A RECEBER -->
+      <div class="view" id="view-contasreceber">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Total a receber (dívida de clientes): <span class="mono" id="contasreceber-total" style="color:var(--green-600);font-weight:700;">0,00 MT</span></h3>
+          <button class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="showView('clientes')"><i class="fa-solid fa-arrow-right"></i> Gerir em Clientes</button>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Clientes com saldo devedor</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-contasreceber">
+              <thead><tr><th>Cliente</th><th>Telefone</th><th>NIF</th><th style="text-align:right;">Saldo devedor</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-contasreceber" style="display:none;"><i class="fa-solid fa-hand-holding-dollar"></i><p>Nenhum cliente com dívida pendente. Óptimo!</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOLHA DE SALÁRIOS -->
+      <div class="view" id="view-folhasalarios">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">INSS: Trabalhador 3% · Entidade Patronal 4% · IRPS: escalões configuráveis</h3>
+          <button class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="openIrpsModal()"><i class="fa-solid fa-sliders"></i> Configurar Escalões de IRPS</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-folha-salarios">
+              <thead><tr><th>Nome</th><th>Cargo</th><th style="text-align:right;">Salário Bruto</th><th style="text-align:right;">INSS Trab. 3%</th><th style="text-align:right;">Base IRPS</th><th style="text-align:right;">IRPS</th><th style="text-align:right;">Total Descontos</th><th style="text-align:right;">Salário Líquido</th><th style="text-align:right;">INSS Patronal 4%</th></tr></thead>
+              <tbody></tbody>
+              <tfoot></tfoot>
+            </table>
+            <div class="empty-state" id="empty-folha-salarios" style="display:none;"><i class="fa-solid fa-user-tie"></i><p>Registe funcionários em "Funcionários" para calcular a folha de salários.</p></div>
+          </div>
+        </div>
+        <div class="auth-error" id="folha-salarios-aviso" style="display:none;margin-top:14px;"></div>
+      </div>
+
+      <!-- IMOBILIZADO -->
+      <div class="view" id="view-imobilizado">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Valor líquido total do imobilizado: <span class="mono" id="imobilizado-total-liquido" style="color:var(--ink);font-weight:700;">0,00 MT</span></h3>
+          <button class="btn btn-primary" onclick="openImobilizadoModal()"><i class="fa-solid fa-plus"></i> Novo Bem</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-imobilizado">
+              <thead><tr><th>Bem</th><th>Categoria</th><th style="text-align:right;">Custo Aquisição</th><th>Data Aquisição</th><th style="text-align:right;">Vida Útil</th><th style="text-align:right;">Deprec. Anual</th><th style="text-align:right;">Valor Líquido</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-imobilizado" style="display:none;"><i class="fa-solid fa-building-columns"></i><p>Ainda não tem bens registados no imobilizado.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORÇAMENTO VS REAL -->
+      <div class="view" id="view-orcamento">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Orçamento vs Realizado — Ano <input type="number" id="orcamento-ano" value="" style="width:80px;border:1.5px solid var(--border);border-radius:6px;padding:4px 8px;font-weight:700;" onchange="renderOrcamento()"></h3>
+          <button class="btn btn-primary" onclick="openOrcamentoModal()"><i class="fa-solid fa-plus"></i> Nova Rubrica</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-orcamento">
+              <thead><tr><th>Rubrica</th><th>Tipo</th><th style="text-align:right;">Orçado</th><th style="text-align:right;">Realizado</th><th style="text-align:right;">Desvio</th><th style="text-align:right;">Desvio %</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-orcamento" style="display:none;"><i class="fa-solid fa-scale-balanced"></i><p>Ainda não definiu rubricas de orçamento para este ano.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDÁRIO FISCAL -->
+      <div class="view" id="view-calendariofiscal">
+        <div class="panel">
+          <div class="panel-head"><h3>Calendário Fiscal de Moçambique — referência geral</h3></div>
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-calendario-fiscal">
+              <thead><tr><th>Data aproximada</th><th>Obrigação Fiscal</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--slate-400);margin-top:10px;">Datas de referência geral — podem variar ligeiramente todos os anos. Confirme sempre os prazos exactos junto da Autoridade Tributária de Moçambique (AT) ou do seu contabilista certificado.</p>
+      </div>
+
+      <!-- PERFIL -->
+      <div class="view" id="view-perfil">
+        <div class="panel">
+          <div class="profile-card">
+            <div class="p-avatar" id="perfil-avatar">U</div>
+            <div>
+              <div style="font-size:19px;font-weight:800;" id="perfil-nome-display">—</div>
+              <div style="color:var(--slate-600);font-size:14px;" id="perfil-negocio-display">—</div>
+            </div>
+          </div>
+          <div class="panel-body" style="border-top:1px solid var(--border);">
+            <form onsubmit="handleSaveProfile(event)">
+              <div class="grid-2">
+                <div class="field"><label>Nome do negócio</label><div class="field-plain"><input type="text" id="perfil-business" required></div></div>
+                <div class="field"><label>Nome do empreendedor</label><div class="field-plain"><input type="text" id="perfil-owner" required></div></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label>Telefone</label><div class="field-plain"><input type="tel" id="perfil-phone" required></div></div>
+                <div class="field"><label>E-mail de login</label><div class="field-plain"><input type="email" id="perfil-email" required></div></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label>Tipo de negócio</label><div class="field-plain"><input type="text" id="perfil-tipo" disabled style="background:#F1F5F9;color:var(--slate-600);"></div></div>
+                <div class="field"><label>Cidade</label><div class="field-plain"><input type="text" id="perfil-cidade"></div></div>
+              </div>
+              <div class="field"><label>Endereço</label><div class="field-plain"><input type="text" id="perfil-endereco"></div></div>
+              <button type="submit" class="btn btn-primary" style="margin-top:6px;"><i class="fa-solid fa-floppy-disk"></i> Guardar alterações</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:18px;">
+          <div class="panel-head"><h3>Dados Fiscais da Empresa</h3></div>
+          <div class="panel-body">
+            <form onsubmit="handleSaveDadosFiscais(event)">
+              <div class="grid-2">
+                <div class="field"><label>NUIT</label><div class="field-plain"><input type="text" id="fiscal-nuit" placeholder="Número Único de Identificação Tributária"></div></div>
+                <div class="field"><label>Forma Jurídica</label><div class="field-plain">
+                  <select id="fiscal-forma-juridica">
+                    <option value="">—</option>
+                    <option>Lda.</option><option>S.A.</option><option>ENI</option><option>Cooperativa</option>
+                  </select>
+                </div></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label>Sector de Actividade</label><div class="field-plain"><input type="text" id="fiscal-sector"></div></div>
+                <div class="field"><label>CAE (Código de Actividade Económica)</label><div class="field-plain"><input type="text" id="fiscal-cae"></div></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label>E-mail da empresa</label><div class="field-plain"><input type="email" id="fiscal-email"></div></div>
+                <div class="field"><label>Capital Social (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="fiscal-capital-social"></div></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label>Data de Constituição</label><div class="field-plain"><input type="date" id="fiscal-data-constituicao"></div></div>
+                <div class="field"><label>Número de Funcionários</label><div class="field-plain"><input type="number" step="1" min="0" id="fiscal-num-funcionarios"></div></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label>Regime de IVA</label><div class="field-plain">
+                  <select id="fiscal-regime-iva"><option>Normal</option><option>Simplificado</option><option>Isento</option></select>
+                </div></div>
+                <div class="field"><label>Regime de IRPC</label><div class="field-plain">
+                  <select id="fiscal-regime-irpc"><option>Geral</option><option>Simplificado</option></select>
+                </div></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label>Taxa de IVA Aplicável (%)</label><div class="field-plain"><input type="number" step="0.01" min="0" max="100" id="fiscal-taxa-iva" placeholder="Ex: 16"></div></div>
+                <div class="field"><label>Taxa de IRPC (%)</label><div class="field-plain"><input type="number" step="0.01" min="0" max="100" id="fiscal-taxa-irpc" placeholder="Ex: 32"></div></div>
+              </div>
+              <div class="grid-2">
+                <div class="field"><label>Responsável Financeiro</label><div class="field-plain"><input type="text" id="fiscal-responsavel"></div></div>
+                <div class="field"><label>Contabilista Certificado</label><div class="field-plain"><input type="text" id="fiscal-contabilista"></div></div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top:6px;"><i class="fa-solid fa-floppy-disk"></i> Guardar Dados Fiscais</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIGURACOES -->
+      <div class="view" id="view-configuracoes">
+        <div class="panel" style="margin-bottom:18px;">
+          <div class="panel-head"><h3>Módulos activos <span class="sr-sub" style="font-weight:400;">— ligue só o que o seu negócio precisa</span></h3></div>
+          <div class="panel-body" id="cfg-modulos-lista"></div>
+        </div>
+        <div class="panel" style="margin-bottom:18px;">
+          <div class="panel-head"><h3>Dados da empresa</h3></div>
+          <div class="panel-body">
+            <div class="settings-row">
+              <div><div class="sr-title" id="cfg-nome-negocio">—</div><div class="sr-sub" id="cfg-negocio-sub">—</div></div>
+              <button class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="showView('perfil')"><i class="fa-solid fa-pen"></i> Editar no Perfil</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:18px;">
+          <div class="panel-head"><h3>Segurança</h3></div>
+          <div class="panel-body">
+            <div class="settings-row">
+              <div><div class="sr-title">Senha de acesso</div><div class="sr-sub">Recomendamos trocar a senha periodicamente</div></div>
+              <button class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="openModal('modal-trocar-senha')"><i class="fa-solid fa-key"></i> Trocar senha</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:18px;">
+          <div class="panel-head"><h3>Aparência e idioma</h3></div>
+          <div class="panel-body">
+            <div class="settings-row">
+              <div><div class="sr-title">Moeda</div><div class="sr-sub">Todos os valores são exibidos em Metical (MZN)</div></div>
+              <span class="tag blue">MZN — MT</span>
+            </div>
+            <div class="settings-row">
+              <div><div class="sr-title">Idioma</div><div class="sr-sub">Idioma da interface do sistema</div></div>
+              <div class="field-plain" style="width:200px;"><select id="cfg-idioma" onchange="handleChangeIdioma()">
+                <option value="pt-MZ">Português (Moçambique)</option>
+                <option value="en" disabled>English (em breve)</option>
+              </select></div>
+            </div>
+            <div class="settings-row">
+              <div><div class="sr-title">Modo escuro</div><div class="sr-sub">Reduz o brilho da interface para uso à noite</div></div>
+              <div class="switch" id="switch-dark-mode" onclick="toggleDarkMode(this)"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Notificações e dados</h3></div>
+          <div class="panel-body">
+            <div class="settings-row">
+              <div><div class="sr-title">Notificações de dívidas de clientes</div><div class="sr-sub">Receber alerta quando um cliente tiver saldo devedor elevado</div></div>
+              <div class="switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="settings-row">
+              <div><div class="sr-title">Resumo semanal por e-mail</div><div class="sr-sub">Enviar um resumo das receitas e despesas todas as segundas-feiras</div></div>
+              <div class="switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="settings-row">
+              <div><div class="sr-title">Backup automático</div><div class="sr-sub">Guardar uma cópia de segurança dos seus dados diariamente</div></div>
+              <div class="switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- =========================================================
+     PAINEL DE ADMINISTRAÇÃO (super_admin e visualizador)
+========================================================= -->
+<section id="screen-admin" class="screen">
+  <div id="admin-shell" style="display:flex;min-height:100vh;">
+    <div class="sidebar-overlay" id="admin-sidebar-overlay" onclick="toggleAdminSidebar(false)"></div>
+    <aside class="sidebar" id="admin-sidebar" style="position:fixed;">
+      <div class="sidebar-logo"><span class="coin sm">MT</span> ContaFácil MZ</div>
+      <div class="sidebar-section-label" style="padding-top:20px;">Painel de Administração</div>
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-admin-view="empresas" onclick="showAdminView('empresas')"><i class="fa-solid fa-building"></i> Empresas</a>
+        <a class="nav-item" data-admin-view="usuarios" id="admin-nav-usuarios" onclick="showAdminView('usuarios')" style="display:none;"><i class="fa-solid fa-users-gear"></i> Utilizadores</a>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="sidebar-user">
+          <div class="u-avatar" id="admin-sidebar-avatar">U</div>
+          <div>
+            <div class="u-name" id="admin-sidebar-username">Utilizador</div>
+            <div class="u-biz" id="admin-sidebar-papel">Papel</div>
+          </div>
+        </div>
+        <a href="javascript:void(0)" class="logout-link" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair da conta</a>
+      </div>
+    </aside>
+
+    <div class="main-area" style="margin-left:250px;flex:1;">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <button class="hamburger" onclick="toggleAdminSidebar(true)"><i class="fa-solid fa-bars"></i></button>
+          <div class="topbar-title"><div class="crumb" id="admin-topbar-crumb">Painel de Administração</div><h1 id="admin-topbar-title">Empresas</h1></div>
+        </div>
+      </div>
+
+      <!-- LISTA DE EMPRESAS -->
+      <div class="view active" id="admin-view-empresas">
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-admin-empresas">
+              <thead><tr><th>Empresa</th><th>Tipo</th><th>Cidade</th><th>Dono</th><th style="text-align:right;">Produtos</th><th style="text-align:right;">Utilizadores</th><th style="text-align:right;">Receitas (mês)</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUTOS DE UMA EMPRESA -->
+      <div class="view" id="admin-view-produtos-empresa">
+        <div class="view-toolbar">
+          <button class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="showAdminView('empresas')"><i class="fa-solid fa-arrow-left"></i> Voltar às Empresas</button>
+          <h3 id="admin-produtos-empresa-nome" style="font-size:16px;"></h3>
+        </div>
+
+        <div class="cards-grid">
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon navy"><i class="fa-solid fa-wallet"></i></div></div><div class="sc-label">Saldo actual</div><div class="sc-value mono" id="admin-emp-saldo">0,00 MT</div></div>
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon green"><i class="fa-solid fa-arrow-trend-up"></i></div></div><div class="sc-label">Receitas (mês)</div><div class="sc-value mono" id="admin-emp-receitas">0,00 MT</div></div>
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon red"><i class="fa-solid fa-arrow-trend-down"></i></div></div><div class="sc-label">Despesas (mês)</div><div class="sc-value mono" id="admin-emp-despesas">0,00 MT</div></div>
+          <div class="stat-card"><div class="sc-top"><div class="sc-icon blue"><i class="fa-solid fa-sack-dollar"></i></div></div><div class="sc-label">Lucro (mês)</div><div class="sc-value mono" id="admin-emp-lucro">0,00 MT</div></div>
+        </div>
+
+        <div class="period-filter" id="admin-emp-tabs" style="margin-bottom:16px;display:inline-flex;">
+          <button class="active" data-tab="produtos" onclick="showAdminEmpresaTab('produtos')">Produtos</button>
+          <button data-tab="clientes" onclick="showAdminEmpresaTab('clientes')">Clientes</button>
+          <button data-tab="funcionarios" onclick="showAdminEmpresaTab('funcionarios')">Funcionários</button>
+        </div>
+
+        <div class="panel admin-emp-tab-panel" id="admin-emp-tab-produtos">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-admin-produtos">
+              <thead><tr><th>Produto</th><th>Categoria</th><th>Marca</th><th style="text-align:right;">Preço unid.</th><th style="text-align:right;">Preço caixa</th><th style="text-align:right;">Estoque (un.)</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-admin-produtos" style="display:none;"><i class="fa-solid fa-box-open"></i><p>Esta empresa ainda não tem produtos registados.</p></div>
+          </div>
+        </div>
+
+        <div class="panel admin-emp-tab-panel" id="admin-emp-tab-clientes" style="display:none;">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-admin-clientes">
+              <thead><tr><th>Cliente</th><th>Telefone</th><th style="text-align:right;">Saldo devedor</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-admin-clientes" style="display:none;"><i class="fa-solid fa-users"></i><p>Esta empresa ainda não tem clientes registados.</p></div>
+          </div>
+        </div>
+
+        <div class="panel admin-emp-tab-panel" id="admin-emp-tab-funcionarios" style="display:none;">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-admin-funcionarios">
+              <thead><tr><th>Funcionário</th><th>Cargo</th><th style="text-align:right;">Salário</th><th>Status</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="empty-state" id="empty-admin-funcionarios" style="display:none;"><i class="fa-solid fa-user-tie"></i><p>Esta empresa ainda não tem funcionários registados.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UTILIZADORES (apenas super_admin) -->
+      <div class="view" id="admin-view-usuarios">
+        <div class="view-toolbar">
+          <h3 style="font-size:15px;color:var(--slate-600);">Contas com acesso ao sistema</h3>
+          <button class="btn btn-primary" onclick="openAdminUsuarioModal()"><i class="fa-solid fa-user-plus"></i> Novo Utilizador</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;overflow-x:auto;">
+            <table class="data-table" id="table-admin-usuarios">
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Empresa</th><th>Papel</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-backdrop" id="modal-admin-usuario">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-user-plus" style="color:var(--blue-700);"></i> Novo Utilizador</h3><button class="modal-close" onclick="closeModal('modal-admin-usuario')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddAdminUsuario(event)">
+      <div class="modal-body">
+        <div class="field"><label>Nome completo</label><div class="field-plain"><input type="text" id="admin-user-nome" required></div></div>
+        <div class="field"><label>E-mail</label><div class="field-plain"><input type="email" id="admin-user-email" required></div></div>
+        <div class="field"><label>Telefone</label><div class="field-plain"><input type="tel" id="admin-user-telefone"></div></div>
+        <div class="field"><label>Senha</label><div class="field-plain"><input type="password" id="admin-user-senha" required minlength="6"></div></div>
+        <div class="field"><label>Papel</label><div class="field-plain">
+          <select id="admin-user-papel">
+            <option value="visualizador">Visualizador (só vê empresas e produtos)</option>
+            <option value="super_admin">Super Administrador (acesso total)</option>
+          </select>
+        </div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-admin-usuario')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Criar Utilizador</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- =========================================================
+     MODAIS
+========================================================= -->
+<div class="modal-backdrop" id="modal-receita">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-arrow-trend-up" style="color:var(--green-600);"></i> Nova Receita</h3><button class="modal-close" onclick="closeModal('modal-receita')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddReceita(event)">
+      <div class="modal-body">
+        <div class="field"><label>Valor (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="receita-valor" placeholder="0,00" required></div></div>
+        <div class="field"><label>Categoria</label><div class="field-plain">
+          <select id="receita-categoria" required></select></div>
+        </div>
+        <div class="field"><label>Descrição</label><div class="field-plain"><input type="text" id="receita-descricao" placeholder="Ex: Venda de produtos" required></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Data</label><div class="field-plain"><input type="date" id="receita-data" required></div></div>
+          <div class="field"><label>Conta bancária (opcional)</label><div class="field-plain"><select id="receita-conta-bancaria"><option value="">— Dinheiro/Caixa</option></select></div></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-receita')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar Receita</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-despesa">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-arrow-trend-down" style="color:var(--danger);"></i> Nova Despesa</h3><button class="modal-close" onclick="closeModal('modal-despesa')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddDespesa(event)">
+      <div class="modal-body">
+        <div class="field"><label>Valor (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="despesa-valor" placeholder="0,00" required></div></div>
+        <div class="field"><label>Categoria</label><div class="field-plain">
+          <select id="despesa-categoria" required></select></div>
+        </div>
+        <div class="field"><label>Descrição</label><div class="field-plain"><input type="text" id="despesa-descricao" placeholder="Ex: Compra de mercadoria" required></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Data</label><div class="field-plain"><input type="date" id="despesa-data" required></div></div>
+          <div class="field"><label>Conta bancária (opcional)</label><div class="field-plain"><select id="despesa-conta-bancaria"><option value="">— Dinheiro/Caixa</option></select></div></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-despesa')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar Despesa</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-produto">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-box" style="color:var(--blue-700);"></i> <span id="produto-modal-title">Novo Produto</span></h3><button class="modal-close" onclick="closeModal('modal-produto')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleSaveProduto(event)">
+      <div class="modal-body">
+        <input type="hidden" id="produto-id">
+        <div class="ob-logo-row" style="margin-bottom:18px;">
+          <div class="ob-logo-preview" id="produto-imagem-preview"><i class="fa-solid fa-image"></i></div>
+          <label class="btn btn-outline" style="color:var(--ink);border-color:var(--border);cursor:pointer;font-size:13px;">
+            <i class="fa-solid fa-upload"></i> Imagem do produto
+            <input type="file" accept="image/*" id="produto-imagem-input" style="display:none;" onchange="handleProdutoImagem(event)">
+          </label>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Nome do produto</label><div class="field-plain"><input type="text" id="produto-nome" placeholder="Ex: Esparguete" required></div></div>
+          <div class="field"><label>Categoria</label><div class="field-plain"><input type="text" id="produto-categoria" placeholder="Ex: Massas" required></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Marca</label><div class="field-plain"><input type="text" id="produto-marca" placeholder="Ex: Milaneza"></div></div>
+          <div class="field"><label>Fornecedor</label><div class="field-plain">
+            <select id="produto-fornecedor">
+              <option value="">Nenhum / a definir</option>
+            </select>
+          </div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Código interno</label><div class="field-plain"><input type="text" id="produto-codigo-interno" placeholder="Ex: PRD-001"></div></div>
+          <div class="field"><label>Código de barras</label><div class="field-plain"><input type="text" id="produto-codigo-barras" placeholder="Ex: 750123456789"></div></div>
+        </div>
+        <div class="field"><label>Descrição</label><div class="field-plain"><input type="text" id="produto-descricao" placeholder="Breve descrição do produto"></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Preço de compra (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="produto-preco-compra" placeholder="0,00" required></div></div>
+          <div class="field"><label>Preço de venda — unidade (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="produto-preco-venda-unidade" placeholder="0,00" required></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Preço de venda — caixa (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="produto-preco-venda-caixa" placeholder="0,00" required></div></div>
+          <div class="field"><label>Quantidade por caixa</label><div class="field-plain"><input type="number" step="1" min="1" id="produto-qtd-caixa" placeholder="Ex: 20" required></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Quantidade em estoque (unidades)</label><div class="field-plain"><input type="number" step="1" min="0" id="produto-qtd-estoque" placeholder="0" required></div></div>
+          <div class="field"><label>Quantidade mínima (caixas)</label><div class="field-plain"><input type="number" step="1" min="0" id="produto-qtd-minima" placeholder="Ex: 10" required></div></div>
+        </div>
+        <div class="field"><label>Status</label><div class="field-plain">
+          <select id="produto-status"><option value="Ativo">Ativo</option><option value="Inativo">Inativo</option></select>
+        </div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-produto')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar Produto</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-movimento">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-right-left" style="color:var(--blue-700);"></i> Registar Movimento de Estoque</h3><button class="modal-close" onclick="closeModal('modal-movimento')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleMovimentoEstoque(event)">
+      <div class="modal-body">
+        <div class="field"><label>Produto</label><div class="field-plain">
+          <select id="movimento-produto" required onchange="updateMovimentoContext()"></select>
+        </div></div>
+        <div class="field" id="movimento-contexto" style="font-size:13px;color:var(--slate-600);margin-top:-8px;"></div>
+        <div class="grid-2">
+          <div class="field"><label>Tipo de movimento</label><div class="field-plain">
+            <select id="movimento-tipo" required>
+              <option value="entrada">Entrada de estoque</option>
+              <option value="saida">Saída de estoque</option>
+            </select>
+          </div></div>
+          <div class="field"><label>Unidade</label><div class="field-plain">
+            <select id="movimento-unidade" required>
+              <option value="unidades">Unidades</option>
+              <option value="caixas">Caixas</option>
+            </select>
+          </div></div>
+        </div>
+        <div class="field"><label>Quantidade</label><div class="field-plain"><input type="number" step="1" min="1" id="movimento-quantidade" placeholder="0" required></div></div>
+        <div class="field"><label>Motivo</label><div class="field-plain"><input type="text" id="movimento-motivo" placeholder="Ex: Venda ao balcão, reposição, quebra..." required></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-movimento')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Registar Movimento</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-cliente">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-user-plus" style="color:var(--blue-700);"></i> Novo Cliente</h3><button class="modal-close" onclick="closeModal('modal-cliente')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddCliente(event)">
+      <div class="modal-body">
+        <div class="field"><label>Nome do cliente</label><div class="field-plain"><input type="text" id="cliente-nome" placeholder="Nome completo" required></div></div>
+        <div class="field"><label>Telefone</label><div class="field-plain"><input type="tel" id="cliente-telefone" placeholder="84 000 0000" required></div></div>
+        <div class="field"><label>NIF (opcional)</label><div class="field-plain"><input type="text" id="cliente-nif" placeholder="Número de Identificação Fiscal"></div></div>
+        <div class="field"><label>Saldo devedor inicial (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="cliente-saldo" placeholder="0,00" value="0"></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-cliente')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar Cliente</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-pagamento">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-hand-holding-dollar" style="color:var(--green-600);"></i> Registar Pagamento</h3><button class="modal-close" onclick="closeModal('modal-pagamento')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleRegistarPagamento(event)">
+      <div class="modal-body">
+        <input type="hidden" id="pagamento-cliente-id">
+        <div class="settings-row" style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;">
+          <div><div class="sr-title" id="pagamento-cliente-nome">—</div><div class="sr-sub">Saldo devedor actual: <b class="mono" id="pagamento-cliente-saldo-atual">0,00 MT</b></div></div>
+        </div>
+        <div class="field"><label>Valor do pagamento (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0.01" id="pagamento-valor" placeholder="0,00" required></div></div>
+        <div class="field"><label>Data do pagamento</label><div class="field-plain"><input type="date" id="pagamento-data" required></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-pagamento')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Registar Pagamento</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-historico">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--blue-700);"></i> Histórico de Pagamentos</h3><button class="modal-close" onclick="closeModal('modal-historico')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="settings-row" style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;">
+        <div><div class="sr-title" id="historico-cliente-nome">—</div><div class="sr-sub">Saldo devedor actual: <b class="mono" id="historico-cliente-saldo">0,00 MT</b></div></div>
+      </div>
+      <table class="data-table" id="table-historico">
+        <thead><tr><th>Data</th><th style="text-align:right;">Valor pago</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty-state" id="empty-historico" style="display:none;padding:24px 0;"><i class="fa-solid fa-clock"></i><p>Ainda não há pagamentos registados para este cliente.</p></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" onclick="closeModal('modal-historico')">Fechar</button></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-fornecedor">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-truck-field" style="color:var(--blue-700);"></i> Novo Fornecedor</h3><button class="modal-close" onclick="closeModal('modal-fornecedor')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddFornecedor(event)">
+      <div class="modal-body">
+        <div class="field"><label>Nome do contacto</label><div class="field-plain"><input type="text" id="fornecedor-nome" required></div></div>
+        <div class="field"><label>Empresa</label><div class="field-plain"><input type="text" id="fornecedor-empresa"></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Telefone</label><div class="field-plain"><input type="tel" id="fornecedor-telefone" required></div></div>
+          <div class="field"><label>E-mail</label><div class="field-plain"><input type="email" id="fornecedor-email"></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Cidade</label><div class="field-plain"><input type="text" id="fornecedor-cidade"></div></div>
+          <div class="field"><label>Produtos fornecidos</label><div class="field-plain"><input type="text" id="fornecedor-produtos" placeholder="Ex: Massas, Arroz"></div></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-fornecedor')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar Fornecedor</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-compra">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-cart-shopping" style="color:var(--blue-700);"></i> Nova Compra</h3><button class="modal-close" onclick="closeModal('modal-compra')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddCompra(event)">
+      <div class="modal-body">
+        <div class="field"><label>Fornecedor</label><div class="field-plain">
+          <select id="compra-fornecedor" required></select>
+        </div></div>
+        <div class="field"><label>Produto</label><div class="field-plain">
+          <select id="compra-produto" required onchange="updateCompraContext()"></select>
+        </div></div>
+        <div class="field" id="compra-contexto" style="font-size:13px;color:var(--slate-600);margin-top:-8px;"></div>
+        <div class="grid-2">
+          <div class="field"><label>Quantidade (unidades)</label><div class="field-plain"><input type="number" step="1" min="1" id="compra-quantidade" required></div></div>
+          <div class="field"><label>Custo por unidade (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="compra-custo-unitario" required></div></div>
+        </div>
+        <div class="field"><label>Data</label><div class="field-plain"><input type="date" id="compra-data" required></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-compra')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Registar Compra</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-funcionario">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-user-tie" style="color:var(--blue-700);"></i> Novo Funcionário</h3><button class="modal-close" onclick="closeModal('modal-funcionario')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddFuncionario(event)">
+      <div class="modal-body">
+        <div class="field"><label>Nome completo</label><div class="field-plain"><input type="text" id="funcionario-nome" required></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Cargo</label><div class="field-plain"><input type="text" id="funcionario-cargo" placeholder="Ex: Vendedor(a)" required></div></div>
+          <div class="field"><label>Telefone</label><div class="field-plain"><input type="tel" id="funcionario-telefone" required></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Salário mensal (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="funcionario-salario" required></div></div>
+          <div class="field"><label>Status</label><div class="field-plain">
+            <select id="funcionario-status"><option value="Ativo">Ativo</option><option value="Inativo">Inativo</option></select>
+          </div></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-funcionario')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar Funcionário</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-caixa-abrir">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-lock-open" style="color:var(--green-600);"></i> Abrir Caixa</h3><button class="modal-close" onclick="closeModal('modal-caixa-abrir')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAbrirCaixa(event)">
+      <div class="modal-body">
+        <div class="field"><label>Saldo inicial (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="caixa-abrir-saldo" placeholder="0,00" required></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-caixa-abrir')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Abrir Caixa</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-caixa-fechar">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-lock" style="color:var(--danger);"></i> Fechar Caixa</h3><button class="modal-close" onclick="closeModal('modal-caixa-fechar')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleFecharCaixa(event)">
+      <div class="modal-body">
+        <div class="settings-row" style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;flex-direction:column;align-items:flex-start;gap:6px;">
+          <div class="r-line" style="display:flex;justify-content:space-between;width:100%;"><span>Saldo inicial</span><b class="mono" id="fechar-saldo-inicial">0,00 MT</b></div>
+          <div class="r-line" style="display:flex;justify-content:space-between;width:100%;"><span>Entradas</span><b class="mono amount-pos" id="fechar-entradas">0,00 MT</b></div>
+          <div class="r-line" style="display:flex;justify-content:space-between;width:100%;"><span>Saídas</span><b class="mono amount-neg" id="fechar-saidas">0,00 MT</b></div>
+          <div class="r-line" style="display:flex;justify-content:space-between;width:100%;"><span>Sangrias</span><b class="mono amount-neg" id="fechar-sangrias">0,00 MT</b></div>
+          <div class="r-line" style="display:flex;justify-content:space-between;width:100%;"><span>Reforços</span><b class="mono amount-pos" id="fechar-reforcos">0,00 MT</b></div>
+          <div class="r-line" style="display:flex;justify-content:space-between;width:100%;border-top:1px dashed var(--border);padding-top:6px;"><span>Saldo esperado</span><b class="mono" id="fechar-saldo-esperado">0,00 MT</b></div>
+        </div>
+        <div class="field"><label>Saldo final contado (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="caixa-fechar-saldo" placeholder="0,00" required oninput="updateDiferencaCaixa()"></div></div>
+        <div class="field"><label>Diferença</label><div class="field-plain"><input type="text" id="caixa-diferenca" disabled style="background:#F1F5F9;"></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-caixa-fechar')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Confirmar Fecho</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-recibo">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-receipt" style="color:var(--green-600);"></i> Recibo</h3><button class="modal-close" onclick="closeModal('modal-recibo')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="recibo-box" id="recibo-conteudo"></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" onclick="closeModal('modal-recibo')">Fechar</button></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-trocar-senha">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-key" style="color:var(--blue-700);"></i> Trocar Senha</h3><button class="modal-close" onclick="closeModal('modal-trocar-senha')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleTrocarSenha(event)">
+      <div class="modal-body">
+        <div class="auth-error" id="trocar-senha-erro">As senhas não coincidem.</div>
+        <div class="field"><label>Senha atual</label><div class="field-plain"><input type="password" id="senha-atual" required></div></div>
+        <div class="field"><label>Nova senha</label><div class="field-plain"><input type="password" id="senha-nova" required minlength="6"></div></div>
+        <div class="field"><label>Confirmar nova senha</label><div class="field-plain"><input type="password" id="senha-confirmar" required minlength="6"></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-trocar-senha')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar Nova Senha</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-banco">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-building-columns" style="color:var(--blue-700);"></i> Nova Conta Bancária</h3><button class="modal-close" onclick="closeModal('modal-banco')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddBanco(event)">
+      <div class="modal-body">
+        <div class="field"><label>Nome do banco</label><div class="field-plain"><input type="text" id="banco-nome" placeholder="Ex: BCI, Millennium bim, Standard Bank" required></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Número da conta</label><div class="field-plain"><input type="text" id="banco-numero-conta"></div></div>
+          <div class="field"><label>Titular</label><div class="field-plain"><input type="text" id="banco-titular"></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Tipo de conta</label><div class="field-plain">
+            <select id="banco-tipo-conta"><option>Conta à Ordem</option><option>Conta Poupança</option><option>Conta Empresarial</option></select>
+          </div></div>
+          <div class="field"><label>Saldo inicial (MT)</label><div class="field-plain"><input type="number" step="0.01" id="banco-saldo-inicial" value="0"></div></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-banco')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-cartao">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-credit-card" style="color:var(--blue-700);"></i> Novo Cartão</h3><button class="modal-close" onclick="closeModal('modal-cartao')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddCartao(event)">
+      <div class="modal-body">
+        <div class="field"><label>Nome do cartão</label><div class="field-plain"><input type="text" id="cartao-nome" placeholder="Ex: Cartão Visa Empresa" required></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Banco emissor</label><div class="field-plain"><input type="text" id="cartao-banco"></div></div>
+          <div class="field"><label>Tipo</label><div class="field-plain"><select id="cartao-tipo"><option>Débito</option><option>Crédito</option></select></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Últimos 4 dígitos</label><div class="field-plain"><input type="text" id="cartao-ultimos-digitos" maxlength="4" placeholder="1234"></div></div>
+          <div class="field"><label>Limite (MT, se crédito)</label><div class="field-plain"><input type="number" step="0.01" id="cartao-limite"></div></div>
+        </div>
+        <div class="field"><label>Conta bancária associada (opcional)</label><div class="field-plain">
+          <select id="cartao-conta-bancaria"><option value="">— Nenhuma</option></select>
+        </div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-cartao')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-categoria">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-tags" style="color:var(--blue-700);"></i> Nova Categoria</h3><button class="modal-close" onclick="closeModal('modal-categoria')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddCategoria(event)">
+      <div class="modal-body">
+        <div class="field"><label>Nome</label><div class="field-plain"><input type="text" id="categoria-nome" required></div></div>
+        <div class="field"><label>Tipo</label><div class="field-plain">
+          <select id="categoria-tipo"><option value="receita">Receita</option><option value="despesa">Despesa</option></select>
+        </div></div>
+        <div class="field"><label>Cor</label><div class="field-plain"><input type="color" id="categoria-cor" value="#2563EB" style="height:42px;padding:4px;"></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-categoria')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-caixa-movimento">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-right-left" style="color:var(--blue-700);"></i> <span id="caixa-mov-titulo">Sangria</span></h3><button class="modal-close" onclick="closeModal('modal-caixa-movimento')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleRegistarMovimentoCaixa(event)">
+      <div class="modal-body">
+        <input type="hidden" id="caixa-mov-tipo" value="sangria">
+        <div class="field"><label>Valor (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0.01" id="caixa-mov-valor" required></div></div>
+        <div class="field"><label>Motivo</label><div class="field-plain"><input type="text" id="caixa-mov-motivo" placeholder="Ex: Depósito no banco, troco inicial..."></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-caixa-movimento')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Confirmar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-conta-pagar">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-money-bill-transfer" style="color:var(--blue-700);"></i> Nova Conta a Pagar</h3><button class="modal-close" onclick="closeModal('modal-conta-pagar')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddContaPagar(event)">
+      <div class="modal-body">
+        <div class="field"><label>Fornecedor</label><div class="field-plain">
+          <select id="cp-fornecedor"><option value="">— (opcional)</option></select>
+        </div></div>
+        <div class="field"><label>Descrição</label><div class="field-plain"><input type="text" id="cp-descricao" placeholder="Ex: Factura Nº 123"></div></div>
+        <div class="field"><label>Valor (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0.01" id="cp-valor" required></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Data de emissão</label><div class="field-plain"><input type="date" id="cp-data-emissao"></div></div>
+          <div class="field"><label>Data de vencimento</label><div class="field-plain"><input type="date" id="cp-data-vencimento"></div></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-conta-pagar')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-imobilizado">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-building-columns" style="color:var(--blue-700);"></i> Novo Bem do Imobilizado</h3><button class="modal-close" onclick="closeModal('modal-imobilizado')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddImobilizado(event)">
+      <div class="modal-body">
+        <div class="field"><label>Descrição do bem</label><div class="field-plain"><input type="text" id="im-descricao" placeholder="Ex: Viatura de serviço" required></div></div>
+        <div class="field"><label>Categoria</label><div class="field-plain"><input type="text" id="im-categoria" placeholder="Ex: Equipamento, Viatura, Mobiliário"></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Custo de aquisição (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="im-custo" required></div></div>
+          <div class="field"><label>Data de aquisição</label><div class="field-plain"><input type="date" id="im-data-aquisicao" required></div></div>
+        </div>
+        <div class="field"><label>Vida útil (anos)</label><div class="field-plain"><input type="number" step="1" min="1" id="im-vida-util" value="5" required></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-imobilizado')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-orcamento">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-scale-balanced" style="color:var(--blue-700);"></i> Nova Rubrica de Orçamento</h3><button class="modal-close" onclick="closeModal('modal-orcamento')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddOrcamento(event)">
+      <div class="modal-body">
+        <div class="field"><label>Nome da rubrica</label><div class="field-plain"><input type="text" id="orc-rubrica" placeholder="Ex: Receitas Totais" required></div></div>
+        <div class="field"><label>Tipo</label><div class="field-plain">
+          <select id="orc-tipo"><option value="receita">Receita</option><option value="despesa">Despesa</option></select>
+        </div></div>
+        <div class="field"><label>Categorias incluídas (opcional)</label><div class="field-plain">
+          <select id="orc-categorias" multiple style="height:110px;"></select>
+        </div><div class="sr-sub" style="margin-top:4px;">Segure Ctrl/Cmd para escolher várias. Se não escolher nenhuma, o realizado fica em 0.</div></div>
+        <div class="field"><label>Valor orçado (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="orc-valor" required></div></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-orcamento')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-iva-lancamento">
+  <div class="modal-box">
+    <div class="modal-head"><h3><i class="fa-solid fa-percent" style="color:var(--blue-700);"></i> Novo Lançamento de IVA</h3><button class="modal-close" onclick="closeModal('modal-iva-lancamento')"><i class="fa-solid fa-xmark"></i></button></div>
+    <form onsubmit="handleAddIva(event)">
+      <div class="modal-body">
+        <div class="field"><label>Tipo</label><div class="field-plain">
+          <select id="iva-tipo"><option value="liquidado">Liquidado (Venda)</option><option value="dedutivel">Dedutível (Compra)</option></select>
+        </div></div>
+        <div class="field"><label>Descrição</label><div class="field-plain"><input type="text" id="iva-descricao" placeholder="Ex: Venda de mercadoria"></div></div>
+        <div class="grid-2">
+          <div class="field"><label>Base tributável (MT)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="iva-base" required></div></div>
+          <div class="field"><label>Taxa de IVA (%)</label><div class="field-plain"><input type="number" step="0.01" min="0" id="iva-taxa" value="16" required></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Nº Factura / Nota</label><div class="field-plain"><input type="text" id="iva-numero-fatura"></div></div>
+          <div class="field"><label>Data</label><div class="field-plain"><input type="date" id="iva-data"></div></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-iva-lancamento')">Cancelar</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-irps">
+  <div class="modal-box" style="width:600px;">
+    <div class="modal-head"><h3><i class="fa-solid fa-sliders" style="color:var(--blue-700);"></i> Escalões de IRPS</h3><button class="modal-close" onclick="closeModal('modal-irps')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="auth-error" style="display:block;background:#FFF7E6;color:#8A6100;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Os valores abaixo <b>não vêm pré-preenchidos</b>. A legislação do IRPS está em revisão (Lei n.º 11/2025, em vigor desde Jan/2026) — confirme os escalões e taxas exactos com o seu contabilista certificado ou a Autoridade Tributária antes de usar em folhas de salário reais.
+      </div>
+      <table class="data-table" id="table-irps-escaloes" style="margin-top:14px;">
+        <thead><tr><th>Limite inferior (MT)</th><th>Limite superior (MT)</th><th>Taxa (%)</th><th>Parcela a abater (MT)</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);margin-top:10px;" onclick="addIrpsEscalaoRow()"><i class="fa-solid fa-plus"></i> Adicionar escalão</button>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-outline" style="color:var(--ink);border-color:var(--border);" onclick="closeModal('modal-irps')">Cancelar</button>
+      <button type="button" class="btn btn-primary" onclick="handleSaveIrpsEscaloes()"><i class="fa-solid fa-check"></i> Guardar Escalões</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts da aplicação, divididos por módulo (ver pasta js/) -->
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/navegacao.js"></script>
+<script src="js/produtos-estoque.js"></script>
+<script src="js/clientes.js"></script>
+<script src="js/financeiro.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/vendas.js"></script>
+<script src="js/fornecedores-compras.js"></script>
+<script src="js/funcionarios.js"></script>
+<script src="js/caixa.js"></script>
+<script src="js/financeiro-avancado.js"></script>
+<script src="js/relatorios.js"></script>
+<script src="js/perfil-config.js"></script>
+<script src="js/empresarial.js"></script>
+<script src="js/init.js"></script>
+</body>
+</html>
