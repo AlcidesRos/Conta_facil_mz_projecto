@@ -8,7 +8,7 @@
    o backend no seu VPS. Enquanto testa no seu computador,
    deixe como está (http://localhost:4000/api).
 ========================================================= */
-const API_BASE = 'http://localhost:4001/api';
+const API_BASE = 'https://conta-facil-mz-projecto.onrender.com';
 
 let authToken = null;
 
