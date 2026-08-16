@@ -1,17 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-
-const corsOptions = {
-  origin: '*', // Em produção, deves colocar aqui o domínio da Vercel: 'https://conta-facil-mz-projecto.vercel.app'
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-  credentials: true
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Importante para os pedidos OPTIONS
-
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
@@ -40,6 +29,18 @@ const categoriasRoutes = require('./routes/categorias.routes');
 const pagamentosRoutes = require('./routes/pagamentos.routes');
 
 const app = express();
+
+//Cors
+const corsOptions = {
+  origin: '*', // Em produção, deves colocar aqui o domínio da Vercel: 'https://conta-facil-mz-projecto.vercel.app'
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Importante para os pedidos OPTIONS
+
 
 app.use(helmet());
 app.use(express.json({ limit: '5mb' }));
